@@ -3,67 +3,65 @@
 #include <Adafruit_ADXL345_U.h>
 
 // I2C pins
-#define SDA_PIN 21
-#define SCL_PIN 22
-
-// ADXL345 instances (0x53 and 0x1D)
-Adafruit_ADXL345_Unified accel1 = Adafruit_ADXL345_Unified(12345, 0x53);
-Adafruit_ADXL345_Unified accel2 = Adafruit_ADXL345_Unified(12346, 0x1D);
+#define SDA_PIN 8
+#define SCL_PIN 9
 
 // Joystick pins
-const int pinVRx = 35;  // ADC1_CH7
-const int pinVRy = 34;  // ADC1_CH6
-const int pinSW  = 18;  // digital button
+#define VX_PIN 1
+#define VY_PIN 2
+
+const float alpha = 0.95;
+
+Adafruit_ADXL345_Unified accel(12345);
+
+float prev_raw_x = 0, prev_raw_y = 0, prev_raw_z = 0;
+float prev_filt_x = 0, prev_filt_y = 0, prev_filt_z = 0;
 
 // UART1 pins
-#define ESP32_UART_TX 17
-#define ESP32_UART_RX 16
+// #define ESP32_UART_TX 17
+// #define ESP32_UART_RX 16
 
 void setup() {
-  // USB debug
-  Serial.begin(115200);
-  delay(1000);
-  Serial.println("ESP32 → FPGA streaming demo");
+    Serial.begin(115200);
+    Wire.begin(SDA_PIN, SCL_PIN);
 
-  // I2C init
-  Wire.begin(SDA_PIN, SCL_PIN);
+    if (!accel.begin()) {
+        Serial.println("ADXL345 init failed!");
+        while (1) delay(10);
+    }
+    accel.setRange(ADXL345_RANGE_2_G);
 
-  // Init both ADXL345s
-  if (!accel1.begin()) {
-    Serial.println("ERROR: ADXL345 #1 not found");
-    while (1);
-  }
-  accel1.setRange(ADXL345_RANGE_2_G);
+    analogReadResolution(12);        // 12 bits resolution (0~4095)
+    analogSetAttenuation(ADC_11db);
 
-  if (!accel2.begin()) {
-    Serial.println("ERROR: ADXL345 #2 not found");
-    while (1);
-  }
-  accel2.setRange(ADXL345_RANGE_2_G);
-
-  // Joystick switch pull-up
-  pinMode(pinSW, INPUT_PULLUP);
-
-  // UART1 for FPGA (8N1, 115200)
-  Serial1.begin(115200, SERIAL_8N1, ESP32_UART_RX, ESP32_UART_TX);
+    // UART1 for FPGA (8N1, 115200)
+    // Serial1.begin(115200, SERIAL_8N1, ESP32_UART_RX, ESP32_UART_TX);
 }
 
 void loop() {
-  sensors_event_t e1, e2;
-  accel1.getEvent(&e1);
-  accel2.getEvent(&e2);
+    sensors_event_t ev;
+    accel.getEvent(&ev);
 
-  int xJ = analogRead(pinVRx);
-  int yJ = analogRead(pinVRy);
-  int btn = (digitalRead(pinSW) == LOW) ? 1 : 0;
+    // Raw (static acceleration)
+    float raw_x = ev.acceleration.x;
+    float raw_y = ev.acceleration.y;
+    float raw_z = ev.acceleration.z;
 
-  // Format: ax1,ay1,az1;ax2,ay2,az2;Jx,Jy,Btn\n
-  Serial1.printf(
-    "%.2f,%.2f,%.2f;%.2f,%.2f,%.2f;%d,%d,%d\n",
-    e1.acceleration.x, e1.acceleration.y, e1.acceleration.z,
-    e2.acceleration.x, e2.acceleration.y, e2.acceleration.z,
-    xJ, yJ, btn
-  );
+    // Derivative (dynamic acceleration)
+    float filt_x = alpha * (prev_filt_x + raw_x - prev_raw_x);
+    float filt_y = alpha * (prev_filt_y + raw_y - prev_raw_y);
+    float filt_z = alpha * (prev_filt_z + raw_z - prev_raw_z);
 
-  delay(10);  // 100 Hz update
+    // Update
+    prev_raw_x  = raw_x;   prev_raw_y  = raw_y;   prev_raw_z  = raw_z;
+    prev_filt_x = filt_x;  prev_filt_y = filt_y;  prev_filt_z = filt_z;
+
+    Serial.printf("dX:%+6.3f  dY:%+6.3f  dZ:%+6.3f\n", filt_x, filt_y, filt_z);
+
+    int x = analogRead(VX_PIN);
+    int y = analogRead(VY_PIN);
+
+    Serial.printf("X=%4d, Y=%4d\n", x, y);
+
+    delay(100);
 }
