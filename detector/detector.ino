@@ -9,6 +9,7 @@
 // Joystick pins
 #define VX_PIN 1
 #define VY_PIN 2
+#define SW_PIN 3
 
 const float alpha = 0.95;
 
@@ -31,6 +32,7 @@ void setup() {
     }
     accel.setRange(ADXL345_RANGE_2_G);
 
+    pinMode(swPin, INPUT_PULLUP);
     analogReadResolution(12);        // 12 bits resolution (0~4095)
     analogSetAttenuation(ADC_11db);
 
@@ -56,12 +58,14 @@ void loop() {
     prev_raw_x  = raw_x;   prev_raw_y  = raw_y;   prev_raw_z  = raw_z;
     prev_filt_x = filt_x;  prev_filt_y = filt_y;  prev_filt_z = filt_z;
 
+    Serial.printf("X:%+6.3f   Y:%+6.3f   Z:%+6.3f\n", raw_x, raw_y, raw_z);
     Serial.printf("dX:%+6.3f  dY:%+6.3f  dZ:%+6.3f\n", filt_x, filt_y, filt_z);
 
     int x = analogRead(VX_PIN);
     int y = analogRead(VY_PIN);
+    int sw = digitalRead(SW_PIN);
 
-    Serial.printf("X=%4d, Y=%4d\n", x, y);
+    Serial.printf("rX=%4d     rY=%4d     SW=%d\n", x, y, sw==LOW ? 0 : 1);
 
     delay(100);
 }
