@@ -1,17 +1,14 @@
-package srampkg;
-   localparam int MAP_X = 1023; // Maximum X coordinate
-   localparam int MAP_Y = 767;  // Maximum Y coordinate
-
-   localparam int PLAYER_X = 512; // Player's initial X coordinate
-   localparam int PLAYER_Y = 384; // Player's initial Y coordinate
-   localparam int SQUAT_PLAYER_Y = 512; // Player's initial Y coordinate
-
-   localparam int BULLET_X = 512; // Bullet's initial X coordinate
-   localparam int BULLET_Y = 384; // Bullet's initial Y coordinate
-endpackage
-
-
 package sram_pkg;
+    localparam int MAP_X = 800;
+    localparam int MAP_Y = 450;
+
+    localparam int PLAYER_X = 100;
+    localparam int PLAYER_Y = 100;
+    localparam int SQUAT_PLAYER_Y = 30;
+
+    localparam int BULLET_X = 50;
+    localparam int BULLET_Y = 25;
+
     // Display
     localparam int VGA_H = 1600;
     localparam int VGA_V = 900;
@@ -21,7 +18,7 @@ package sram_pkg;
     localparam int COLOR_WIDTH = 4;
     localparam int PLAYER_SIZE = 40;
     localparam int BULLET_SIZE = 40;
-    
+
     // Map
     localparam int MAP_H = VGA_H;
     localparam int MAP_V = 800;

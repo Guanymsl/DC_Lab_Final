@@ -1,25 +1,22 @@
-package gamepkg;
+package game_pkg;
     import sram_pkg::*;
-    localparam int STEP_X = 5;   // Step size for X movement
-    localparam int STEP_Y = 5;   // Step size for Y movement
+    localparam int STEP_X = 4;
 
-    localparam int BULLET_STEP_X = 11; // Width for position coordinates
+    localparam int BULLET_STEP_X = 6;
 
-    localparam int G = 1;        // Gravity constant
-    localparam int V = 10;       // Initial jump velocity
-    localparam int MAX_J = 20;   // Maximum jump count
+    localparam int V = 20;
+    localparam int MAX_J = 80;
 
-    localparam int MAX_HP = 100; // Maximum health points
-    localparam int LIMIT_X = 10;  // Limit for X coordinate
+    localparam int LIMIT_X = 600;
 
     localparam int OBJECT_OPACITY_NUM = 2; // no map and bar and ?blocks
     localparam int OBJECT_OPACITY_NUM_WIDTH = 2;
-    
+
     typedef enum logic [3:0] {
         OBJECT_MAP  = 4'd0,
         OBJECT_PLAYER1  = 4'd1,
         OBJECT_PLAYER1_SHIELD = 4'd2,
-        OBJECT_PLAYER1_SQUAT = 4'd3, 
+        OBJECT_PLAYER1_SQUAT = 4'd3,
         OBJECT_PLAYER2 = 4'd4,
         OBJECT_PLAYER2_SHIELD = 4'd5,
         OBJECT_PLAYER2_SQUAT = 4'd6,
