@@ -14,22 +14,22 @@ module GameControl (
     input logic defend,
     input logic select,
 
-    output logic [1:0]             o_state,
-    output logic [POS_WIDTH-1:0]   o_player_x,
-    output logic [POS_WIDTH-1:0]   o_player_y,
+    output logic [1:0]                     o_state,
+    output logic signed [POS_WIDTH-1:0]   o_player_x,
+    output logic signed [POS_WIDTH-1:0]   o_player_y,
     output logic [1:0]             o_player_hp,
     output logic                   o_player_shield,
     output logic                   o_player_squat,
-    output logic [POS_WIDTH-1:0]   o_enemy_x,
-    output logic [POS_WIDTH-1:0]   o_enemy_y,
+    output logic signed [POS_WIDTH-1:0]   o_enemy_x,
+    output logic signed [POS_WIDTH-1:0]   o_enemy_y,
     output logic [1:0]             o_enemy_hp,
     output logic                   o_enemy_shield,
-    output logic                   o_enemy_squat
-    output logic [POS_WIDTH-1:0]   o_goodbullet_x,
-    output logic [POS_WIDTH-1:0]   o_goodbullet_y,
+    output logic                   o_enemy_squat,
+    output logic signed [POS_WIDTH-1:0]   o_goodbullet_x,
+    output logic signed [POS_WIDTH-1:0]   o_goodbullet_y,
     output logic                   o_goodbullet_isE,
-    output logic [POS_WIDTH-1:0]   o_badbullet_x,
-    output logic [POS_WIDTH-1:0]   o_badbullet_y,
+    output logic signed [POS_WIDTH-1:0]   o_badbullet_x,
+    output logic signed [POS_WIDTH-1:0]   o_badbullet_y,
     output logic                   o_badbullet_isE
 );
 
