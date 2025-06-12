@@ -92,9 +92,9 @@ module GameControl (
         .o_random_out({rightRd, jumpRd, attackRd, dummy})
     );
 
-    assign leftRd = ~rightRd;
-    assign squatRd = ~jumpRd;
-    assign defendRd = ~attackRd;
+    assign leftRd = !rightRd;
+    assign squatRd = !jumpRd;
+    assign defendRd = !attackRd;
 
     Player player (
         .clk(clk),
@@ -163,10 +163,10 @@ module GameControl (
         enemy_hp_w  = enemy_hp_r;
 
         if (state_r == S_PLAY) begin
-            if (playerIsHit && ~o_player_shield && player_hp_r != 0) begin
+            if (playerIsHit && !o_player_shield && player_hp_r != 0) begin
                 player_hp_w = player_hp_r - 1;
             end
-            if (enemyIsHit && ~o_enemy_shield && enemy_hp_r != 0) begin
+            if (enemyIsHit && !o_enemy_shield && enemy_hp_r != 0) begin
                 enemy_hp_w = enemy_hp_r - 1;
             end
         end

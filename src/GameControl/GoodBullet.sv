@@ -37,12 +37,12 @@ module GoodBullet (
         if (isE_r) begin
             x_w = x_r + BULLET_STEP_X;
             if (isQ) begin
-                if ((x_w + BULLET_X > xEnemy - PLAYER_X) && ~((y_w - BULLET_Y > yEnemy + SQUAT_PLAYER_Y) || (y_w + BULLET_Y < yEnemy + SQUAT_PLAYER_Y))) begin
+                if ((x_w + BULLET_X > xEnemy - PLAYER_X) && !((y_w - BULLET_Y > yEnemy + SQUAT_PLAYER_Y) || (y_w + BULLET_Y < yEnemy + SQUAT_PLAYER_Y))) begin
                     isHit = 1;
                     isE_w = 0;
                 end
             end else begin
-                if ((x_w + BULLET_X > xEnemy - PLAYER_X) && ~((y_w - BULLET_Y > yEnemy + PLAYER_Y) || (y_w + BULLET_Y < yEnemy + PLAYER_Y))) begin
+                if ((x_w + BULLET_X > xEnemy - PLAYER_X) && !((y_w - BULLET_Y > yEnemy + PLAYER_Y) || (y_w + BULLET_Y < yEnemy + PLAYER_Y))) begin
                     isHit = 1;
                     isE_w = 0;
                 end
@@ -52,7 +52,7 @@ module GoodBullet (
                 isE_w = 0;
             end
         end else begin
-            if (~defend && attack) begin
+            if (!defend && attack) begin
                 isE_w  = 1;
                 x_w    = xPlayer + PLAYER_X + BULLET_X;
                 y_w    = yPlayer;
