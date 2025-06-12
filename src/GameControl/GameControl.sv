@@ -90,6 +90,7 @@ module GameControl (
     assign o_enemy_hp = enemy_hp_r;
 
     logic dummy;
+
     .Random random (
         .enable(clk),
         .i_rst_n(rst_n),
@@ -112,7 +113,7 @@ module GameControl (
         .y(o_player_y),
         .isD(playerIsD),
         .isQ(playerIsQ),
-        .isJ(playerIsJ),
+        .isJ(playerIsJ)
     );
 
     .Enemy enemy (
@@ -127,7 +128,7 @@ module GameControl (
         .y(o_enemy_y),
         .isD(enemyIsD),
         .isQ(enemyIsQ),
-        .isJ(enemyIsJ),
+        .isJ(enemyIsJ)
     );
 
     .GoodBullet goodbullet (
@@ -142,7 +143,7 @@ module GameControl (
         .isQ(playerIsQ),
         .x(o_goodbullet_x),
         .y(o_goodbullet_y),
-        .isE(o_goodbullet_isE)
+        .isE(o_goodbullet_isE),
         .isHit(enemyIsHit)
     );
 
@@ -158,7 +159,7 @@ module GameControl (
         .isQ(playerIsQ),
         .x(o_badbullet_x),
         .y(o_badbullet_y),
-        .isE(o_badbullet_isE)
+        .isE(o_badbullet_isE),
         .isHit(playerIsHit)
     );
 
