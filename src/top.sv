@@ -25,7 +25,7 @@ module top (
     output o_H_sync,
     output o_V_sync,
     output [23:0] o_RGB,
-    output o_RGB_valid,
+    output o_RGB_valid
 );
     logic [31:0] o_frame_counter;
     wire render_clk;
@@ -186,20 +186,43 @@ module top (
     // opacity map combinatorial logic
 
     // need to be modified
+
+    wire [sram_pkg::COLOR_WIDTH-1:0] player1_lut_data [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    player1_lut u_player1_lut (
+        .pixel_data    (player1_lut_data)
+    );
+
+    wire [sram_pkg::COLOR_WIDTH-1:0] player2_lut_data [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    player2_lut u_player2_lut (
+        .pixel_data    (player2_lut_data)
+    );
+
+    wire [sram_pkg::COLOR_WIDTH-1:0] bullet1_lut_data [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1];
+    bullet1_lut u_bullet1_lut (
+        .pixel_data    (bullet1_lut_data)
+    );
+
+    wire [sram_pkg::COLOR_WIDTH-1:0] bulle2_lut_data [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1];
+    bullet2_lut u_bullet2_lut (
+        .pixel_data    (bullet2_lut_data)
+    );
+
     genvar i, j;
     generate
-        for (i = 0; i < sram_pkg::CAR_SIZE; i = i + 1) begin: opacity_mask_generate_i
-            for (j = 0; j < sram_pkg::CAR_SIZE; j = j + 1) begin: opacity_mask_generate_j
-                assign car1_opacity_mask_w[i][j] = ( V_frameEncoder_output == i &&
-                                                    H_frameEncoder_output == j &&
-                                                    pixel_object_id == game_pkg::OBJECT_CAR1 &&
-                                                    pixel_opacity_valid ) ? 
-                                                    pixel_opacity : car1_opacity_mask_r[i][j];
-                assign car2_opacity_mask_w[i][j] = ( V_frameEncoder_output == i &&
-                                                    H_frameEncoder_output == j &&
-                                                    pixel_object_id == game_pkg::OBJECT_CAR2 &&
-                                                    pixel_opacity_valid ) ? 
-                                                    pixel_opacity : car2_opacity_mask_r[i][j];
+        for (i = 0; i < sram_pkg::PLAYER_SIZE; i = i + 1) begin: opacity_mask_generate_i
+            for (j = 0; j < sram_pkg::PLAYER_SIZE; j = j + 1) begin: opacity_mask_generate_j
+                assign player1_opacity_mask_w[i][j] = (player1_lut_data[i][j] != 0)?1'b1:1'b0;
+                assign player2_opacity_mask_w[i][j] = (player2_lut_data[i][j] != 0)?1'b1:1'b0;
+            end
+        end
+    endgenerate
+
+    genvar p, q;
+    generate
+        for (p = 0; p < sram_pkg::BULLET_SIZE; p = p + 1) begin: opacity_mask_generate_p
+            for (q = 0; q < sram_pkg::BULLET_SIZE; q = q + 1) begin: opacity_mask_generate_q
+                assign bullet1_opacity_mask_w[i][j] = (bullet1_lut_data[i][j] != 0)?1'b1:1'b0;
+                assign bullet2_opacity_mask_w[i][j] = (bullet2_lut_data[i][j] != 0)?1'b1:1'b0;
             end
         end
     endgenerate
@@ -207,18 +230,31 @@ module top (
     // opacity map sequential logic
     always @(posedge i_clk or negedge i_rst_n) begin
         if (!i_rst_n) begin
-            for (integer i = 0; i < sram_pkg::CAR_SIZE; i = i + 1) begin
-                for (integer j = 0; j < sram_pkg::CAR_SIZE; j = j + 1) begin
-                        car1_opacity_mask_r[i][j] <= 0;
-                        car2_opacity_mask_r[i][j] <= 0;
+            for (integer i = 0; i < sram_pkg::PLAYER_SIZE; i = i + 1) begin
+                for (integer j = 0; j < sram_pkg::PLAYER_SIZE; j = j + 1) begin
+                        player1_opacity_mask_r[i][j] <= 0;
+                        player2_opacity_mask_r[i][j] <= 0;
+                end
+            end
+            for (integer i = 0; i < sram_pkg::BULLET_SIZE; i = i + 1) begin
+                for (integer j = 0; j < sram_pkg::BULLET_SIZE; j = j + 1) begin
+                        bullet1_opacity_mask_r[i][j] <= 0;
+                        bullet1_opacity_mask_r[i][j] <= 0;
                 end
             end
         end
+
         else begin
-            for (integer i = 0; i < sram_pkg::CAR_SIZE; i = i + 1) begin
-                for (integer j = 0; j < sram_pkg::CAR_SIZE; j = j + 1) begin
-                    car1_opacity_mask_r[i][j] <= car1_opacity_mask_w[i][j];
-                    car2_opacity_mask_r[i][j] <= car2_opacity_mask_w[i][j];
+            for (integer i = 0; i < sram_pkg::PLAYER_SIZE; i = i + 1) begin
+                for (integer j = 0; j < sram_pkg::PLAYER_SIZE; j = j + 1) begin
+                        player1_opacity_mask_r[i][j] <= player1_opacity_mask_w[i][j];
+                        player2_opacity_mask_r[i][j] <= player2_opacity_mask_w[i][j];
+                end
+            end
+            for (integer i = 0; i < sram_pkg::BULLET_SIZE; i = i + 1) begin
+                for (integer j = 0; j < sram_pkg::BULLET_SIZE; j = j + 1) begin
+                        bullet1_opacity_mask_r[i][j] <= bullet1_opacity_mask_w[i][j];
+                        bullet1_opacity_mask_r[i][j] <= bullet2_opacity_mask_w[i][j];
                 end
             end
         end
