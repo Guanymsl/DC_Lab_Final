@@ -137,7 +137,7 @@ module top (
 
         .i_bullet2_x(bullet2_x),
         .i_bullet2_y(bullet2_y),
-        .i_bullet1_valid(bullet2_valid),
+        .i_bullet2_valid(bullet2_valid),
 
         .i_player1_opacity_mask(player1_opacity_mask_r),
         .i_player2_opacity_mask(player2_opacity_mask_r),
