@@ -1,42 +1,14 @@
 import game_pkg::*;
 import sram_pkg::*;
 
-module Main (
+module top (
     input i_clk,
     input i_rst_n,
-
     input i_start,
     input i_restart,
 
-    // temporarily not used
-    input i_I2C_clk,
-    output o_I2C_sclk,
-    inout io_I2C_sdat,
-
-    // optional
-    inout i_AUD_BCLK,
-    inout i_AUD_DACLRCK,
-    output o_AUD_DACDAT,
-
     // reserved for our GPIO inputs //
-    input [2:0] i_car1_acc,
-    input [2:0] i_car2_acc,
-
-    input [2:0] i_car1_brake,
-    input [2:0] i_car2_brake,
-
-    input [3:0] i_car1_omega,
-    input [3:0] i_car2_omega,
-
-    output o_car1_vibrate,
-    output o_car2_vibrate,
-    ////
-
-    output [2:0] o_game_state, // debug
-
-    //output [game_pkg::VELOCITY_OUTPUT_WIDTH-1:0] o_car1_v_m,
-    //output [game_pkg::VELOCITY_OUTPUT_WIDTH-1:0] o_car2_v_m,
-    output [game_pkg::VELOCITY_OUTPUT_WIDTH-1:0] o_player_v,
+    input i_
 
     // SRAM interface
     output [sram_pkg::SRAM_ADDR_COUNT-1:0] o_SRAM_ADDR,
@@ -48,12 +20,9 @@ module Main (
     output o_V_sync,
     output [23:0] o_RGB,
     output o_RGB_valid,
-    output [31:0] o_frame_counter,
-    output o_render_clk
 );
 
     wire render_clk;
-    assign o_render_clk = render_clk;
 
     //// SRAM part, maybe don't have to change
     wire sram_writing;
