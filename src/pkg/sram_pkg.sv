@@ -16,12 +16,12 @@ package sram_pkg;
 
     // Image
     localparam int COLOR_WIDTH = 4;
-    localparam int PLAYER_SIZE = 40;
-    localparam int BULLET_SIZE = 40;
+    localparam int PLAYER_SIZE = 200;
+    localparam int BULLET_SIZE = 100;
 
     // Map
     localparam int MAP_H = VGA_H;
-    localparam int MAP_V = 800;
+    localparam int MAP_V = 900;
     localparam int MAP_H_WIDTH = 11;
     localparam int MAP_V_WIDTH = 10;
 
