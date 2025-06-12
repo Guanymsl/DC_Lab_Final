@@ -86,7 +86,7 @@ module GameControl (
 
     logic dummy;
 
-    .Random random (
+    Random random (
         .enable(select),
         .i_rst_n(rst_n),
         .o_random_out({rightRd, jumpRd, attackRd, dummy})
@@ -96,7 +96,7 @@ module GameControl (
     assign squatRd = ~jumpRd;
     assign defendRd = ~attackRd;
 
-    .Player player (
+    Player player (
         .clk(clk),
         .rst_n(rst_n),
         .right(right),
@@ -111,7 +111,7 @@ module GameControl (
         .isJ(playerIsJ)
     );
 
-    .Enemy enemy (
+    Enemy enemy (
         .clk(clk),
         .rst_n(rst_n),
         .right(rightRd),
@@ -126,7 +126,7 @@ module GameControl (
         .isJ(enemyIsJ)
     );
 
-    .GoodBullet goodbullet (
+    GoodBullet goodbullet (
         .clk(clk),
         .rst_n(rst_n),
         .attack(attack),
@@ -142,7 +142,7 @@ module GameControl (
         .isHit(enemyIsHit)
     );
 
-    .BadBullet badbullet (
+    BadBullet badbullet (
         .clk(clk),
         .rst_n(rst_n),
         .attack(attackRd),
