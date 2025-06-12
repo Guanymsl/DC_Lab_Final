@@ -20,7 +20,6 @@ module Enemy (
     logic signed [ 9:0] y_r, y_w;
     logic               isJ_r, isJ_w;
     logic        [ 3:0] Jcnt_r, Jcnt_w;
-    logic signed [ 9:0] yInit_r, yInit_w;
 
     assign x   = x_r;
     assign y   = y_r;
