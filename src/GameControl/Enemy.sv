@@ -44,10 +44,9 @@ module Enemy (
     end
 
     always_comb begin
-        y_w      = y_r;
-        isJ_w    = isJ_r;
-        Jcnt_w   = Jcnt_r;
-        yInit_w  = yInit_r;
+        y_w    = y_r;
+        isJ_w  = isJ_r;
+        Jcnt_w = Jcnt_r;
 
         if (isJ_r) begin
             if (Jcnt_r >= MAX_J) begin
@@ -56,21 +55,18 @@ module Enemy (
             end else begin
                 Jcnt_w = Jcnt_r + 1;
             end
-            y_w = yInit_r + V * Jcnt_r - (G * Jcnt_r * Jcnt_r) / 2;
+            y_w = -MAP_Y + PLAYER_Y + V * Jcnt_r - (G * Jcnt_r * Jcnt_r) / 2;
+            if (y_w < -MAP_Y + PLAYER_Y) begin
+                y_w = -MAP_Y + PLAYER_Y;
+            end
         end else begin
             if (jump) begin
                 isJ_w   = 1;
                 Jcnt_w  = 0;
-                yInit_w = y_r;
             end
-        end
-
-        if (squat) begin
-            if (y_w < -MAP_Y + SQUAT_PLAYER_Y) begin
+            if (squat) begin
                 y_w = -MAP_Y + SQUAT_PLAYER_Y;
-            end
-        end else if (y_w > -MAP_Y + PLAYER_Y) begin
-            if (y_w < -MAP_Y + PLAYER_Y) begin
+            end else begin
                 y_w = -MAP_Y + PLAYER_Y;
             end
         end
@@ -82,13 +78,11 @@ module Enemy (
             y_r     <= -MAP_Y + PLAYER_Y;
             isJ_r   <= 0;
             Jcnt_r  <= 0;
-            yInit_r <= 0;
         end else begin
             x_r     <= x_w;
             y_r     <= y_w;
             isJ_r   <= isJ_w;
             Jcnt_r  <= Jcnt_w;
-            yInit_r <= yInit_w;
         end
     end
 
