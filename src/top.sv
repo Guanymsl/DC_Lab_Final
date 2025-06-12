@@ -194,7 +194,7 @@ module top (
         .pixel_data    (bullet1_lut_data)
     );
 
-    wire [sram_pkg::COLOR_WIDTH-1:0] bulle2_lut_data [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1];
+    wire [sram_pkg::COLOR_WIDTH-1:0] bullet2_lut_data [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1];
     bullet2_lut u_bullet2_lut (
         .pixel_data    (bullet2_lut_data)
     );

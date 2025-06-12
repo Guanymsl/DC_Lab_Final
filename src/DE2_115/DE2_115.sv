@@ -207,7 +207,7 @@ parser parser0(
 	.select(select)
 );
 
-Top top0(
+top top0(
 	.i_clk              (CLK_108M),
 	.i_rst_n            (KEY[3]),
 	.i_start       		(select && cnt_r),
