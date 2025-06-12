@@ -8,7 +8,13 @@ module top (
     input i_restart,
 
     // reserved for our GPIO inputs //
-    input i_
+    input i_right,
+    input i_left,
+    input i_jump,
+    input i_squat,
+    input i_attack,
+    input i_defend,
+    input i_select,
 
     // SRAM interface
     output [sram_pkg::SRAM_ADDR_COUNT-1:0] o_SRAM_ADDR,

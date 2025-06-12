@@ -141,19 +141,27 @@ module DE2_115 (
 
 
 logic key0down, key1down, key2down, key3down;
-logic CLK_108M, CLK_12M, CLK_100K, CLK_800K;
+logic CLK_108M, CLK_3226K;
 
-logic data, right, left, jump, squat, attack, defend, select;
-logic UART_RXD, valid;
+logic [7:0] data;
+logic right, left, jump, squat, attack, defend, select;
+logic gpio_uart;
+logic valid;
 
 logic cnt_w, cnt_r;
 
 always_comb begin
 	cnt_w = cnt_r;
-	if ( ) begin
+	if (key0down) begin
 		cnt_w = 1'b1; // reset counter on key press
+	end
+end
+
+always_ff @(posedge CLK_108M) begin
+	if (KEY[3]) begin
+		cnt_r <= 0; // reset counter on key press
 	end else begin
-		cnt_w = cnt_r + 1'b1; // increment counter
+		cnt_r <= cnt_w; // update counter
 	end
 end
 
@@ -169,22 +177,20 @@ Altpll pll0(
 	.clk_clk(CLOCK_50),
 	.reset_reset_n(key3down),
 	.altpll_108m_clk (CLK_108M),
-	.altpll_12m_clk(CLK_12M),
-	.altpll_100k_clk(CLK_100K),
-	.altpll_800k_clk(CLK_800K)
+	.altpll_3226k_clk(CLK_3226K)
 );
 
 Debounce deb0(
-	.i_in(KEY[0]), // restart
+	.i_in(KEY[0]), 
 	.i_rst_n(KEY[3]),
 	.i_clk(CLK_108M),
 	.o_neg(key0down) 
 );
 
 rx rx0(
-	.clk(CLK_108M),
+	.clk(CLK_3226K),
 	.rst_n(KEY[3]),
-	.data_Rx(UART_RXD),
+	.data_Rx(gpio_uart),
 	.data_out(data),
 	.valid(valid)
 );
@@ -203,11 +209,15 @@ parser parser0(
 Top top0(
 	.i_clk              (CLK_108M),
 	.i_rst_n            (KEY[3]),
-	.i_start       		( ),
+	.i_start       		(select && cnt_r),
 	.i_restart			(KEY[0]),
-	.o_game_state		(game_state),
-	.o_car1_v_m         (car1_v_m),
-	.o_car2_v_m         (car2_v_m),
+	.i_right			(right),
+    .i_left			    (left),
+    .i_jump				(jump),
+    .i_squat			(squat),
+    .i_attack			(attack),
+    .i_defend			(defend),
+    .i_select			(select),
 	.o_SRAM_ADDR        (SRAM_ADDR),
 	.io_SRAM_DQ         (SRAM_DQ),
 	.o_SRAM_WE_N        (SRAM_WE_N),
@@ -215,15 +225,6 @@ Top top0(
 	.o_V_sync           (VGA_VS),
 	.o_RGB              ({VGA_R, VGA_G, VGA_B}),
 );
-
-	wire [game_pkg::VELOCITY_OUTPUT_WIDTH-1:0] car1_v_m, car2_v_m;
-
-	wire game_start, game_restart;
-	assign game_start = (SW[8] | (GPIO[34] & GPIO[35]));
-	assign game_restart = SW[9];
-
-
-
 endmodule
 
 	
