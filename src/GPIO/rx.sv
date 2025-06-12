@@ -1,5 +1,5 @@
 module rx #(
-    parameter integer PULSES_BIT = 28
+    parameter integer PULSES_BIT = 29
 )(
     clk,
     rst_n,
@@ -28,8 +28,7 @@ module rx #(
     localparam IDLE   = 3'd0;
     localparam START  = 3'd1;
     localparam RCV    = 3'd2;
-    localparam PARITY = 3'd3;
-    localparam STOP   = 3'd4;
+    localparam STOP   = 3'd3;
 
     logic [ 2:0] state_r, state_w;
     logic [15:0] cnt_r, cnt_w;
@@ -46,7 +45,8 @@ module rx #(
 
         case (state_r)
             IDLE: begin
-                cnt_w   = 0;
+                cnt_w     = 0;
+                bit_cnt_w = 0;
                 if (sig_Rx == 1'b0)
                     state_w = START;
             end
@@ -69,23 +69,24 @@ module rx #(
                     cnt_w = cnt_r + 1;
                 end else begin
                     cnt_w = 0;
-                    data_rcv_w[bit_cnt_r] = sig_Rx;
+                    data_rcv_w[7 - bit_cnt_r] = sig_Rx;
                     if (bit_cnt_r < 7) begin
                         bit_cnt_w = bit_cnt_r + 1;
                     end else begin
                         bit_cnt_w = 0;
-                        state_w   = PARITY;
+                        state_w   = STOP;
                     end
                 end
             end
 
-            PARITY: begin
-                state_w = STOP;
-            end
-
             STOP: begin
-                data_fin_w = 1'b1;
-                state_w    = IDLE;
+                if (cnt_r < PULSES_BIT - 1) begin
+                    cnt_w = cnt_r + 1;
+                end else begin
+                    cnt_w   = 0;
+                    data_fin_w = 1'b1;
+                    state_w = IDLE;
+                end
             end
         endcase
     end
