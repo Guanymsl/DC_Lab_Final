@@ -45,7 +45,7 @@ module GameControl (
     logic [1:0] state_r, state_w;
 
     assign o_is_gaming = (state_r == S_PLAY);
-    
+
     always_comb begin
         state_w = state_r;
         case (state_r)
@@ -73,24 +73,28 @@ module GameControl (
 
     logic rightRd, leftRd, jumpRd, squatRd, attackRd, defendRd;
 
-    logic playerIsD, playerIsQ, playerIsJ, playerIsHit;
-    logic enemyIsD, enemyIsQ, enemyIsJ, enemyIsHit;
-
-    logic goodIsE, badIsE;
+    logic playerIsJ, playerIsHit;
+    logic enemyIsJ, enemyIsHit;
 
     logic [1:0] player_hp_r, player_hp_w;
     logic [1:0] enemy_hp_r, enemy_hp_w;
 
     assign o_state = state_r;
-    assign o_player_shield = playerIsD;
-    assign o_player_squat = playerIsQ;
-    assign o_enemy_shield = enemyIsD;
-    assign o_enemy_squat = enemyIsQ;
-    assign o_goodbullet_isE = goodIsE;
-    assign o_badbullet_isE = badIsE;
 
     assign o_player_hp = player_hp_r;
     assign o_enemy_hp = enemy_hp_r;
+
+    logic dummy;
+
+    .Random random (
+        .enable(select),
+        .i_rst_n(rst_n),
+        .o_random_out({rightRd, jumpRd, attackRd, dummy})
+    );
+
+    assign leftRd = ~rightRd;
+    assign squatRd = ~jumpRd;
+    assign defendRd = ~attackRd;
 
     .Player player (
         .clk(clk),
@@ -102,9 +106,9 @@ module GameControl (
         .defend(defend),
         .x(o_player_x),
         .y(o_player_y),
-        .isD(playerIsD),
-        .isQ(playerIsQ),
-        .isJ(playerIsJ),
+        .isD(o_player_shield),
+        .isQ(o_player_squat),
+        .isJ(playerIsJ)
     );
 
     .Enemy enemy (
@@ -117,9 +121,9 @@ module GameControl (
         .defend(defendRd),
         .x(o_enemy_x),
         .y(o_enemy_y),
-        .isD(enemyIsD),
-        .isQ(enemyIsQ),
-        .isJ(enemyIsJ),
+        .isD(o_enemy_shield),
+        .isQ(o_enemy_squat),
+        .isJ(enemyIsJ)
     );
 
     .GoodBullet goodbullet (
@@ -131,10 +135,10 @@ module GameControl (
         .yPlayer(o_player_y),
         .xEnemy(o_enemy_x),
         .yEnemy(o_enemy_y),
-        .isQ(playerIsQ),
+        .isQ(o_player_squat),
         .x(o_goodbullet_x),
         .y(o_goodbullet_y),
-        .isE(o_goodbullet_isE)
+        .isE(o_goodbullet_isE),
         .isHit(enemyIsHit)
     );
 
@@ -147,10 +151,10 @@ module GameControl (
         .yEnemy(o_enemy_y),
         .xPlayer(o_player_x),
         .yPlayer(o_player_y),
-        .isQ(playerIsQ),
+        .isQ(o_player_squat),
         .x(o_badbullet_x),
         .y(o_badbullet_y),
-        .isE(o_badbullet_isE)
+        .isE(o_badbullet_isE),
         .isHit(playerIsHit)
     );
 
@@ -159,10 +163,10 @@ module GameControl (
         enemy_hp_w  = enemy_hp_r;
 
         if (state_r == S_PLAY) begin
-            if (playerIsHit && ~playerIsD) begin
+            if (playerIsHit && ~o_player_shield && player_hp_r != 0) begin
                 player_hp_w = player_hp_r - 1;
             end
-            if (enemyIsHit && ~enemyIsD) begin
+            if (enemyIsHit && ~o_enemy_shield && enemy_hp_r != 0) begin
                 enemy_hp_w = enemy_hp_r - 1;
             end
         end
