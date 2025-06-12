@@ -84,17 +84,19 @@ module GameControl (
     assign o_player_hp = player_hp_r;
     assign o_enemy_hp = enemy_hp_r;
 
-    logic dummy;
+    logic dummy1, dummy2;
 
-    Random random (
+    Random random1 (
         .enable(select),
         .i_rst_n(rst_n),
-        .o_random_out({rightRd, jumpRd, attackRd, dummy})
+        .o_random_out({rightRd, leftRd, jumpRd, dummy1})
     );
 
-    assign leftRd = !rightRd;
-    assign squatRd = !jumpRd;
-    assign defendRd = !attackRd;
+    Random random2 (
+        .enable(select),
+        .i_rst_n(rst_n),
+        .o_random_out({squatRd, attackRd, defendRd, dummy2})
+    );
 
     Player player (
         .clk(clk),
