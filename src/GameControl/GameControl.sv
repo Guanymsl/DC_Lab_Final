@@ -89,6 +89,17 @@ module GameControl (
     assign o_player_hp = player_hp_r;
     assign o_enemy_hp = enemy_hp_r;
 
+    logic dummy;
+    .Random random (
+        .enable(clk),
+        .i_rst_n(rst_n),
+        .o_random_out({rightRd, jumpRd, attackRd, dummy})
+    );
+
+    assign leftRd  = ~rightRd;
+    assign squatRd = ~jumpRd;
+    assign defendRd = ~attackRd;
+
     .Player player (
         .clk(clk),
         .rst_n(rst_n),
