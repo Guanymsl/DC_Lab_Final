@@ -4,15 +4,15 @@ package game_pkg;
 
     localparam int BULLET_STEP_X = 6;
 
-    localparam int V = 20;
-    localparam int MAX_J = 80;
+    localparam int V = 15;
+    localparam int MAX_J = 4 * V;
 
-    localparam int LIMIT_X = 600;
+    localparam int LIMIT_X = VGA_H * 3 / 8;
 
     localparam int OBJECT_OPACITY_NUM = 2; // no map and bar and ?blocks
     localparam int OBJECT_OPACITY_NUM_WIDTH = 2;
 
-    localparam int HP_WIDTH = 3; 
+    localparam int HP_WIDTH = 3;
 
     typedef enum logic [3:0] {
         OBJECT_MAP  = 4'd0,

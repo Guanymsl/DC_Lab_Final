@@ -1,13 +1,13 @@
 package sram_pkg;
-    localparam int MAP_X = 800;
-    localparam int MAP_Y = 450;
+    localparam int MAP_X = VGA_H / 2;
+    localparam int MAP_Y = VGA_V / 2;
 
-    localparam int PLAYER_X = 100;
-    localparam int PLAYER_Y = 100;
-    localparam int SQUAT_PLAYER_Y = 30;
+    localparam int PLAYER_X = PLAYER_SIZE / 2;
+    localparam int PLAYER_Y = PLAYER_SIZE / 2;
+    localparam int SQUAT_PLAYER_Y = PLAYER_SIZE * 0.15;
 
-    localparam int BULLET_X = 50;
-    localparam int BULLET_Y = 25;
+    localparam int BULLET_X = BULLET_SIZE / 2;
+    localparam int BULLET_Y = BULLET_SIZE / 4;
 
     // Display
     localparam int VGA_H = 1600;
