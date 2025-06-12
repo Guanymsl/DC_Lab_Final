@@ -12,6 +12,8 @@ package game_pkg;
     localparam int OBJECT_OPACITY_NUM = 2; // no map and bar and ?blocks
     localparam int OBJECT_OPACITY_NUM_WIDTH = 2;
 
+    localparam int HP_WIDTH = 3; 
+
     typedef enum logic [3:0] {
         OBJECT_MAP  = 4'd0,
         OBJECT_PLAYER1  = 4'd1,
@@ -26,7 +28,7 @@ package game_pkg;
         OBJECT_LOSE_CAPTION = 4'd10,
         OBJECT_IDLE_BG = 4'd11,
         OBJECT_START_CAPTION = 4'd12,
-        OBJECT_START_BG = 4'd13,
+        OBJECT_START_BG = 4'd13
     } ObjectID;
 
     /*

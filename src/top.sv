@@ -56,13 +56,6 @@ module top (
 
     game_pkg::ObjectID pixel_object_id;
 
-    wire [2*sram_pkg::CAR_COOR_WIDTH-1:0] pixel_counter;
-    wire [sram_pkg::CAR_COOR_WIDTH-1:0] H_frameEncoder_output, V_frameEncoder_output;
-    assign H_frameEncoder_output = pixel_counter % sram_pkg::CAR_SIZE;
-    assign V_frameEncoder_output = pixel_counter / sram_pkg::CAR_SIZE;
-
-    wire pixel_opacity, pixel_opacity_valid, frameEncode_done;
-
     reg player1_opacity_mask_w [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
     reg player1_opacity_mask_r [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
     reg player2_opacity_mask_w [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
@@ -84,7 +77,6 @@ module top (
     // status of game, output of GameControl
     wire is_gaming;
     wire game_state;
-    game_pkg::GameResult game_result;
 
     GameControl u_GameControl (
         .clk(render_clk),

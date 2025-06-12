@@ -33,7 +33,7 @@ module PixelDecoder (
 
     // game status
     input i_is_gaming,
-    input [1:0] i_game_state // output state
+    input [1:0] i_game_state, // output state
 
     output game_pkg::ObjectID o_object_id,
     output reg [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] o_object_pixel_index
@@ -105,7 +105,7 @@ module PixelDecoder (
 
     wire [sram_pkg::MAP_H_WIDTH-1:0] bullet2_H_min, bullet2_H_max;
     wire [sram_pkg::MAP_V_WIDTH-1:0] bullet2_V_min, bullet2_V_max;
-    XYtoBoundaries_Bullet xy_2_hv_player2 (
+    XYtoBoundaries_Bullet xy_2_hv_bullet2 (
         .i_x        (i_bullet2_x),
         .i_y        (i_bullet2_y),
         .o_H_min    (bullet2_H_min),
@@ -181,13 +181,13 @@ module PixelDecoder (
     assign render_win_caption = (WIN)
                                 & i_VGA_H >= game_pkg::WIN_CAPTION_H_POS_MIN
                                 & i_VGA_H <= game_pkg::WIN_CAPTION_H_POS_MAX
-                                & i_VGA_V >= game_pkg::WIN_CAPTION_V_POS_MIN
-                                & i_VGA_V <= game_pkg::WIN_CAPTION_V_POS_MAX;
+                                & i_VGA_V >= game_pkg::WIN_LOSE_CAPTION_V_POS_MIN
+                                & i_VGA_V <= game_pkg::WIN_LOSE_CAPTION_V_POS_MAX;
     assign render_loss_caption = (LOSE)
                                 & i_VGA_H >= game_pkg::LOSE_CAPTION_H_POS_MIN
                                 & i_VGA_H <= game_pkg::LOSE_CAPTION_H_POS_MAX
-                                & i_VGA_V >= game_pkg::LOSE_CAPTION_V_POS_MIN
-                                & i_VGA_V <= game_pkg::LOSE_CAPTION_V_POS_MAX;
+                                & i_VGA_V >= game_pkg::WIN_LOSE_CAPTION_V_POS_MIN
+                                & i_VGA_V <= game_pkg::WIN_LOSE_CAPTION_V_POS_MAX;
     assign render_win_caption_index = (i_VGA_V - game_pkg::WIN_LOSE_CAPTION_V_POS_MIN) * sram_pkg::WIN_LOSE_CAPTION_H + i_VGA_H - game_pkg::WIN_CAPTION_H_POS_MIN;
     assign render_lose_caption_index = (i_VGA_V - game_pkg::WIN_LOSE_CAPTION_V_POS_MIN) * sram_pkg::WIN_LOSE_CAPTION_H + i_VGA_H - game_pkg::LOSE_CAPTION_H_POS_MIN;
 
@@ -217,7 +217,7 @@ module PixelDecoder (
                 else if (render_player2) begin
                     if (i_player2_opacity_mask[player2_rel_V][player2_rel_H]) begin
                         o_object_id = game_pkg::OBJECT_PLAYER2;
-                        o_object_pixel_index = render_player2_index
+                        o_object_pixel_index = render_player2_index;
                     end
                     else if (i_player2_shield) begin
                         o_object_id = game_pkg::OBJECT_PLAYER2_SHIELD;
