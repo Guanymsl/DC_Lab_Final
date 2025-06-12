@@ -63,11 +63,7 @@ module Enemy (
                 isJ_w   = 1;
                 Jcnt_w  = 0;
             end
-            if (squat) begin
-                y_w = -MAP_Y + SQUAT_PLAYER_Y;
-            end else begin
-                y_w = -MAP_Y + PLAYER_Y;
-            end
+            y_w = -MAP_Y + PLAYER_Y;
         end
     end
 
