@@ -11,6 +11,9 @@
 #define VY_PIN 2
 #define SW_PIN 3
 
+#define UART_TX 17
+#define UART_RX 16
+
 const float alpha = 0.95;
 
 Adafruit_ADXL345_Unified accel(12345);
@@ -38,6 +41,8 @@ void setup() {
 
     // UART1 for FPGA (8N1, 115200)
     // Serial1.begin(115200, SERIAL_8N1, ESP32_UART_RX, ESP32_UART_TX);
+
+    Serial1.begin(115200, SERIAL_8N1, UART_RX, UART_TX);
 }
 
 void loop() {
@@ -80,6 +85,17 @@ void loop() {
     if (defend) attack = false;
 
     Serial.printf("R = %d, L = %d, J = %d, Q = %d, A = %d, D = %d, S = %d\n", right, left, jump, squat, attack, defend, select);
+
+    uint8_t packet = 0;
+    packet |= right  << 0;
+    packet |= left   << 1;
+    packet |= jump   << 2;
+    packet |= squat  << 3;
+    packet |= attack << 4;
+    packet |= defend << 5;
+    packet |= select << 6;
+
+    Serial1.write(packet);
 
     delay(100);
 }
