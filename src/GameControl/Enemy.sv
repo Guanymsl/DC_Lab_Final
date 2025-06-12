@@ -1,5 +1,5 @@
-import GamePkg::*;
-import SramPkg::*;
+import game_pkg::*;
+import sram_pkg::*;
 
 module Enemy (
     input  logic               clk,

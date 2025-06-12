@@ -1,5 +1,5 @@
-import GamePkg::*;
-import SramPkg::*;
+import game_pkg::*;
+import sram_pkg::*;
 
 module GameControl (
     input logic clk,
