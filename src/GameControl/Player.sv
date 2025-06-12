@@ -24,7 +24,7 @@ module Player (
     assign x   = x_r;
     assign y   = y_r;
     assign isD = defend;
-    assign isQ = (isJ) ? 0 : squat;
+    assign isQ = (isJ_r) ? 0 : squat;
     assign isJ = isJ_r;
 
     always_comb begin
