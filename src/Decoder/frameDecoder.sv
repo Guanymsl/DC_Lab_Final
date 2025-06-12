@@ -1,34 +1,49 @@
 import game_pkg::*;
 import sram_pkg::*;
 
-module FrameDecoder(
-    input i_clk,
-    input i_rst_n,
+module FrameDecoder (
+        input i_clk,
+        input i_rst_n,
+        
+        input signed [sram_pkg::MAP_H_WIDTH-1:0] i_player1_x,
+        input signed [sram_pkg::MAP_V_WIDTH-1:0] i_player1_y,
+        input [game_pkg::HP_WIDTH-1:0] i_player1_hp,
+        input i_player1_shield,
+        input i_player1_squat,
 
-    input signed [sram_pkg::MAP_H_WIDTH-1:0] i_car1_x,
-    input signed [sram_pkg::MAP_V_WIDTH-1:0] i_car1_y,
-    input signed [sram_pkg::MAP_H_WIDTH-1:0] i_car2_x,
-    input signed [sram_pkg::MAP_V_WIDTH-1:0] i_car2_y,
-    
-    input i_car1_opacity_mask [0:sram_pkg::CAR_SIZE-1][0:sram_pkg::CAR_SIZE-1], // 1 for transparent, 0 for opaque
-    input i_car2_opacity_mask [0:sram_pkg::CAR_SIZE-1][0:sram_pkg::CAR_SIZE-1],
+        input signed [sram_pkg::MAP_H_WIDTH-1:0] i_player2_x,
+        input signed [sram_pkg::MAP_V_WIDTH-1:0] i_player2_y,
+        input [game_pkg::HP_WIDTH-1:0] i_player2_hp,
+        input i_player2_shield,
+        input i_player2_squat,
 
-    input [game_pkg::VELOCITY_OUTPUT_WIDTH-1:0] i_car1_v_m,
-    input [game_pkg::VELOCITY_OUTPUT_WIDTH-1:0] i_car2_v_m,
+        input signed [sram_pkg::MAP_H_WIDTH-1:0] i_bullet1_x,
+        input signed [sram_pkg::MAP_H_WIDTH-1:0] i_bullet1_y,
+        input i_bullet1_valid,
 
-    input [game_pkg::HEALTH_OUTPUT_WIDTH-1:0] i_car1_hp_m,
-    input [game_pkg::HEALTH_OUTPUT_WIDTH-1:0] i_car2_hp_m,
+        input signed [sram_pkg::MAP_H_WIDTH-1:0] i_bullet2_x,
+        input signed [sram_pkg::MAP_H_WIDTH-1:0] i_bullet2_y,
+        input i_bullet2_valid,
 
-    input [sram_pkg::MAP_H_WIDTH-1:0] i_VGA_H,
-    input [sram_pkg::MAP_V_WIDTH-1:0] i_VGA_V,
+        input i_player1_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+        input i_player2_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+        input i_bullet1_opacity_mask [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1],
+        input i_bullet2_opacity_mask [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1],
 
-    input i_is_gaming,
-    input game_pkg::GameResult i_game_result,
+        // Input from VGA:
+        input [sram_pkg::MAP_H_WIDTH-1:0] i_VGA_H,
+        input [sram_pkg::MAP_V_WIDTH-1:0] i_VGA_V,
+        
+        // Output for VGA:
+        output [23:0] o_decoded_color,
+        
+        // Input from SRAM:
+        input [sram_pkg::SRAM_DATA_WIDTH-1:0] i_sram_data, // may be delayed 2 cycles?
+        output [sram_pkg::SRAM_ADDR_COUNT-1:0] o_sram_addr, // i_sram_data isn't directly from o_sram_addr!?
 
-    output [sram_pkg::SRAM_ADDR_COUNT-1:0] o_sram_addr,
-    input [sram_pkg::SRAM_DATA_WIDTH-1:0] i_sram_data,
-
-    output [23:0] o_decoded_color
+        // game status
+        input i_is_gaming,
+        input [1:0] i_game_state // output state
 );
 
     // pixel id and flip-flop

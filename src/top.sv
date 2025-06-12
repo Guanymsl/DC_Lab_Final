@@ -73,59 +73,85 @@ module top (
     reg bullet2_opacity_mask_r [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1];
     
     wire [game_pkg::HP_WIDTH-1:0] player1_hp;
+    wire player1_shield;
+    wire player1_sqat;
     wire [game_pkg::HP_WIDTH-1:0] player2_hp;
+    wire player2_shield;
+    wire player2_sqat;
+    wire bullet1_valid;
+    wire bullet2_valid;
 
     // status of game, output of GameControl
     wire is_gaming;
+    wire game_state;
     game_pkg::GameResult game_result;
 
     GameControl u_GameControl (
-        .i_clk              (i_clk),
-        .i_render_clk       (render_clk),
-        .i_rst_n            (i_rst_n),
-        .i_car1_acc         (i_car1_acc),
-        .i_car2_acc         (i_car2_acc),
-        .i_car1_brake       (i_car1_brake),
-        .i_car2_brake       (i_car2_brake),
-        .i_car1_omega       (i_car1_omega),
-        .i_car2_omega       (i_car2_omega),
-        .i_start            (i_start),
-        .i_restart          (i_restart),
-
-        // for debug
-        .o_game_state       (o_game_state),
-        
+        .clk(render_clk),
+        .rst_n(i_rst_n|(~i_restart)),
+        .right(i_right),
+        .left(i_left),
+        .jump(i_jump),
+        .squat(i_squat),
+        .attack(i_attack),
+        .defend(i_defend),
+        .select(i_select),
         // the player's current status
-        .o_player_v(player_v),
-        .o_player_x(player_x),
-        .o_player_y(player_y),
-        .o_player_hp(player_hp),
-        
+        .o_player_x(player1_x),
+        .o_player_y(player1_y),
+        .o_player_hp(player1_hp),
+        .o_player_shield(player1_shield),
+        .o_player_squat(player1_squat),
+
+        .o_enemy_x(player2_x),
+        .o_enemy_y(player2_y),
+        .o_enemy_hp(player2_hp),
+        .o_enemy_shield(player2_shield),
+        .o_enemy_squat(player2_squat),
+
+        .o_goodbullet_x(bullet1_x),
+        .o_goodbullet_y(bullet1_y),
+        .o_goodbullet_isE(bullet1_valid),
+
+        .o_badbullet_x(bullet2_x),
+        .o_badbullet_y(bullet2_y),
+        .o_badbullet_isE(bullet2_valid),
+
         // Gaming status
-        .o_is_gaming        (is_gaming),
-        .o_game_result      (game_result),
-        
-        // For blocks display
-        .o_qBlock0_display  (qBlock0_display),
-        .o_qBlock1_display  (qBlock1_display),
-        .o_qBlock2_display  (qBlock2_display),
-        .o_qBlock3_display  (qBlock3_display)
-        
+        .o_state            (game_state),
+        .o_is_gaming        (is_gaming) 
     );
 
     // FrameDecoder usage: get game and player's status and to be rendered place from VGA, output decoded color to VGA, output address to SRAM, receive data from SRAM
     FrameDecoder u_FrameDecoder (
         .i_clk(i_clk),
         .i_rst_n(i_rst_n),
+
         .i_player1_x(player1_x),
         .i_player1_y(player1_y),
+        .i_player1_hp(player1_hp),
+        .i_player1_shield(player1_shield),
+        .i_player1_squat(player1_sqat),
+
         .i_player2_x(player2_x),
         .i_player2_y(player2_y),
+        .i_player2_hp(player2_hp),
+        .i_player2_shield(player2_shield),
+        .i_player2_squat(player2_sqat),
+
         .i_bullet1_x(bullet1_x),
         .i_bullet1_y(bullet1_y),
+        .i_bullet1_valid(bullet1_valid),
+
         .i_bullet2_x(bullet2_x),
         .i_bullet2_y(bullet2_y),
-        
+        .i_bullet1_valid(bullet2_valid),
+
+        .i_player1_opacity_mask(player1_opacity_mask_r),
+        .i_player2_opacity_mask(player2_opacity_mask_r),
+        .i_bullet1_opacity_mask(bullet1_opacity_mask_r),
+        .i_bullet2_opacity_mask(bullet2_opacity_mask_r),
+
         // Input from VGA:
         .i_VGA_H(H_to_be_rendered),
         .i_VGA_V(V_to_be_rendered),
@@ -139,7 +165,7 @@ module top (
 
         // game status
         .i_is_gaming(is_gaming),
-        .i_game_result(game_result)
+        .i_game_state(game_state) // output state
     );
 
     // VGA is very nice, but notice the 2 cycles delay

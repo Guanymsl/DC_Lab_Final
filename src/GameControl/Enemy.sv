@@ -1,7 +1,7 @@
 import GamePkg::*;
 import SramPkg::*;
 
-module Player (
+module Enemy (
     input  logic               clk,
     input  logic               rst_n,
     input  logic               right,
@@ -36,10 +36,10 @@ module Player (
             x_w = x_r - STEP_X;
         end
 
-        if (x_w > -MAP_X + LIMIT_X) begin
-            x_w = -MAP_X + LIMIT_X;
-        end else if (x_w < -MAP_X + PLAYER_X) begin
-            x_w = -MAP_X + PLAYER_X;
+        if (x_w > MAP_X - PLAYER_X) begin
+            x_w = MAP_X - PLAYER_X;
+        end else if (x_w < MAP_X - LIMIT_X) begin
+            x_w = MAP_X - LIMIT_X;
         end
     end
 
@@ -78,7 +78,7 @@ module Player (
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            x_r     <= -MAP_X + PLAYER_X;
+            x_r     <= MAP_X - PLAYER_X;
             y_r     <= -MAP_Y + PLAYER_Y;
             isJ_r   <= 0;
             Jcnt_r  <= 0;
