@@ -19,14 +19,16 @@ module GoodBullet (
     assign x    = x_r;
     assign y    = y_r;
     assign isE  = isE_r;
+    assign face = face_r;
 
     always_comb begin
         x_w    = x_r;
         y_w    = y_r;
+        face_w = face_r;
         isE_w  = isE_r;
 
         if (isE_r) begin
-            x_w = x_r + STEP_X;
+            x_w = x_r - STEP_X;
             if (x_w > MAX_X || x_w < 0) begin
                 isE_w = 0;
             end
