@@ -206,6 +206,7 @@ module Main (
         .o_game_result      (game_result)
     );
     */
+    
     // Haven't seen yet //////////////////////////////////////////////////////
     FrameEncoder u_FrameEncoder (
         .i_clk              (i_clk),
@@ -293,7 +294,6 @@ module Main (
     );
 
     // opacity map combinatorial logic
-    /*
     genvar i, j;
     generate
         for (i = 0; i < sram_pkg::CAR_SIZE; i = i + 1) begin: opacity_mask_generate_i
@@ -331,5 +331,4 @@ module Main (
             end
         end
     end
-    */
 endmodule
