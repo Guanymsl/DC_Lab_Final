@@ -13,16 +13,20 @@ module SramAddrEncoder (
 
     always @(*) begin
         case (i_object_id)
-            game_pkg::OBJECT_MAP:           sram_addr_w = sram_pkg::MAP_ADDR_START + (i_object_pixel_index >> 2);
-            game_pkg::OBJECT_BAR:           sram_addr_w = sram_pkg::BAR_ADDR_START + (i_object_pixel_index >> 2);
-            game_pkg::OBJECT_BAR_DIGIT:     sram_addr_w = sram_pkg::BAR_DIGIT_ADDR_START + (i_object_pixel_index >> 2);
-            game_pkg::OBJECT_CAR1:          sram_addr_w = sram_pkg::CAR1_ADDR_START + (i_object_pixel_index >> 2);
-            game_pkg::OBJECT_CAR2:          sram_addr_w = sram_pkg::CAR2_ADDR_START + (i_object_pixel_index >> 2);
-            game_pkg::OBJECT_START_CAPTION: sram_addr_w = sram_pkg::START_CAPTION_ADDR_START + (i_object_pixel_index >> 2);
-            game_pkg::OBJECT_WIN_CAPTION:   sram_addr_w = sram_pkg::WIN_CAPTION_ADDR_START + (i_object_pixel_index >> 2);
-            game_pkg::OBJECT_LOSE_CAPTION:  sram_addr_w = sram_pkg::LOSE_CAPTION_ADDR_START + (i_object_pixel_index >> 2);
-            game_pkg::OBJECT_IDLE_BG:       sram_addr_w = sram_pkg::IDLE_BG_ADDR_START + (i_object_pixel_index >> 2);
-            game_pkg::OBJECT_QBLOCK:        sram_addr_w = sram_pkg::QBLOCK_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_MAP            : sram_addr_w = sram_pkg::MAP_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_PLAYER1        : sram_addr_w = sram_pkg::PLAYER1_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_PLAYER1_SHIELD : sram_addr_w = sram_pkg::PLAYER1_SHIELD_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_PLAYER1_SQUAT  : sram_addr_w = sram_pkg::PLAYER1_SQUAT_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_PLAYER2        : sram_addr_w = sram_pkg::PLAYER2_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_PLAYER2_SHIELD : sram_addr_w = sram_pkg::PLAYER2_SHIELD_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_PLAYER2_SQUAT  : sram_addr_w = sram_pkg::PLAYER2_SQUAT_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_BULLET1        : sram_addr_w = sram_pkg::BULLET1_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_BULLET2        : sram_addr_w = sram_pkg::BULLET2_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_WIN_CAPTION    : sram_addr_w = sram_pkg::WIN_CAPTION_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_LOSE_CAPTION   : sram_addr_w = sram_pkg::LOSE_CAPTION_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_IDLE_BG        : sram_addr_w = sram_pkg::IDLE_BG_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_START_CAPTION  : sram_addr_w = sram_pkg::START_CAPTION_ADDR_START + (i_object_pixel_index >> 2);
+            game_pkg::OBJECT_START_BG       : sram_addr_w = sram_pkg::START_BG_ADDR_START + (i_object_pixel_index >> 2);
         endcase
     end
 

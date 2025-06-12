@@ -2,79 +2,143 @@ import game_pkg::*;
 import sram_pkg::*;
 
 module PixelDecoder (
-    input signed [sram_pkg::MAP_H_WIDTH-1:0] i_car1_x,
-    input signed [sram_pkg::MAP_V_WIDTH-1:0] i_car1_y,
-    input signed [sram_pkg::MAP_H_WIDTH-1:0] i_car2_x,
-    input signed [sram_pkg::MAP_V_WIDTH-1:0] i_car2_y,
+    input signed [sram_pkg::MAP_H_WIDTH-1:0] i_player1_x,
+    input signed [sram_pkg::MAP_V_WIDTH-1:0] i_player1_y,
+    input signed [sram_pkg::MAP_H_WIDTH-1:0] i_player2_x,
+    input signed [sram_pkg::MAP_V_WIDTH-1:0] i_player2_y,
 
-    input i_car1_opacity_mask [0:sram_pkg::CAR_SIZE-1][0:sram_pkg::CAR_SIZE-1], // 1 for transparent, 0 for opaque
-    input i_car2_opacity_mask [0:sram_pkg::CAR_SIZE-1][0:sram_pkg::CAR_SIZE-1],
+    input signed [sram_pkg::MAP_H_WIDTH-1:0] i_bullet1_x,
+    input signed [sram_pkg::MAP_H_WIDTH-1:0] i_bullet1_y,
+    input i_bullet1_valid,
 
-    input [game_pkg::VELOCITY_OUTPUT_WIDTH-1:0] i_car1_v_m,
-    input [game_pkg::VELOCITY_OUTPUT_WIDTH-1:0] i_car2_v_m,
+    input signed [sram_pkg::MAP_H_WIDTH-1:0] i_bullet2_x,
+    input signed [sram_pkg::MAP_H_WIDTH-1:0] i_bullet2_y,
+    input i_bullet2_valid,
 
-    input [game_pkg::HEALTH_OUTPUT_WIDTH-1:0] i_car1_hp_m,
-    input [game_pkg::HEALTH_OUTPUT_WIDTH-1:0] i_car2_hp_m,
+    input i_player1_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+    input i_player2_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+    input i_bullet1_opacity_mask [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1],
+    input i_bullet2_opacity_mask [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1],
 
-    input [sram_pkg::MAP_H_WIDTH-1:0] i_VGA_H, // from 1 to 1600
-    input [sram_pkg::MAP_V_WIDTH-1:0] i_VGA_V, // from 1 to 900
+    input [sram_pkg::MAP_H_WIDTH-1:0] i_VGA_H, 
+    input [sram_pkg::MAP_V_WIDTH-1:0] i_VGA_V, 
 
+    input [game_pkg::HP_WIDTH-1:0] i_player1_hp,
+    input i_player1_shield,
+    input i_player1_squat,
+
+    input [game_pkg::HP_WIDTH-1:0] i_player2_hp,
+    input i_player2_shield,
+    input i_player2_squat,
+
+    // game status
     input i_is_gaming,
-    input game_pkg::GameResult i_game_result,
+    input [1:0] i_game_state // output state
 
     output game_pkg::ObjectID o_object_id,
     output reg [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] o_object_pixel_index
-);
-    /*---------------------------------------------------- map/bar render ----------------------------------------------------*/
-    wire [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] render_map_index, render_bar_index;
+);  
+    wire IDLE,WIN,LOSE;
+    assign IDLE = (i_game_state == 2'b00);
+    assign WIN = (i_game_state == 2'b10);
+    assign LOSE = (i_game_state == 2'b11);
+
+    /*---------------------------------------------------- map render ----------------------------------------------------*/
+    wire [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] render_map_index;
     assign render_map_index = (i_VGA_V - 1) * sram_pkg::MAP_H + i_VGA_H - 1;
-    // assign render_bar_index = (i_VGA_V - 1 - sram_pkg::MAP_V) * sram_pkg::MAP_H + i_VGA_H - 1;
 
-    /*------------------------------------------------------ car render ------------------------------------------------------*/
-    wire [sram_pkg::MAP_H_WIDTH-1:0] car1_H_min, car1_H_max;
-    wire [sram_pkg::MAP_V_WIDTH-1:0] car1_V_min, car1_V_max;
-    XYtoBoundaries u_CoorConverter_car1 (
-        .i_x        (i_car1_x),
-        .i_y        (i_car1_y),
-        .o_H_min    (car1_H_min),
-        .o_H_max    (car1_H_max),
-        .o_V_min    (car1_V_min),
-        .o_V_max    (car1_V_max)
+    /*------------------------------------------------------ player render ------------------------------------------------------*/
+    wire [sram_pkg::MAP_H_WIDTH-1:0] player1_H_min, player1_H_max;
+    wire [sram_pkg::MAP_V_WIDTH-1:0] player1_V_min, player1_V_max;
+    XYtoBoundaries_Player xy_2_hv_player1 (
+        .i_x        (i_player1_x),
+        .i_y        (i_player1_y),
+        .o_H_min    (player1_H_min),
+        .o_H_max    (player1_H_max),
+        .o_V_min    (player1_V_min),
+        .o_V_max    (player1_V_max)
     );
 
-    wire [sram_pkg::MAP_H_WIDTH-1:0] car2_H_min, car2_H_max;
-    wire [sram_pkg::MAP_V_WIDTH-1:0] car2_V_min, car2_V_max;
-    XYtoBoundaries u_CoorConverter_car2 (
-        .i_x        (i_car2_x),
-        .i_y        (i_car2_y),
-        .o_H_min    (car2_H_min),
-        .o_H_max    (car2_H_max),
-        .o_V_min    (car2_V_min),
-        .o_V_max    (car2_V_max)
+    wire [sram_pkg::MAP_H_WIDTH-1:0] player2_H_min, player2_H_max;
+    wire [sram_pkg::MAP_V_WIDTH-1:0] player2_V_min, player2_V_max;
+    XYtoBoundaries_Player xy_2_hv_player2 (
+        .i_x        (i_player2_x),
+        .i_y        (i_player2_y),
+        .o_H_min    (player2_H_min),
+        .o_H_max    (player2_H_max),
+        .o_V_min    (player2_V_min),
+        .o_V_max    (player2_V_max)
     );
 
-    wire render_car1, render_car2;
-    assign render_car1 = i_VGA_H >= car1_H_min 
-                        & i_VGA_H <= car1_H_max 
-                        & i_VGA_V >= car1_V_min 
-                        & i_VGA_V <= car1_V_max;
-    assign render_car2 = i_VGA_H >= car2_H_min 
-                        & i_VGA_H <= car2_H_max 
-                        & i_VGA_V >= car2_V_min 
-                        & i_VGA_V <= car2_V_max;
+    wire render_player1, render_player2;
+    assign render_player1 = i_VGA_H >= player1_H_min
+                        & i_VGA_H <= player1_H_max
+                        & i_VGA_V >= player1_V_min
+                        & i_VGA_V <= player1_V_max;
+    assign render_player2 = i_VGA_H >= player2_H_min 
+                        & i_VGA_H <= player2_H_max
+                        & i_VGA_V >= player2_V_min 
+                        & i_VGA_V <= player2_V_max;
 
-    wire [sram_pkg::MAP_H_WIDTH-1:0] car1_rel_H, car2_rel_H;
-    wire [sram_pkg::MAP_V_WIDTH-1:0] car1_rel_V, car2_rel_V;
-    assign car1_rel_H = i_VGA_H - car1_H_min;
-    assign car1_rel_V = i_VGA_V - car1_V_min;
-    assign car2_rel_H = i_VGA_H - car2_H_min;
-    assign car2_rel_V = i_VGA_V - car2_V_min;
+    wire [sram_pkg::MAP_H_WIDTH-1:0] player1_rel_H, player2_rel_H;
+    wire [sram_pkg::MAP_V_WIDTH-1:0] player1_rel_V, player2_rel_V;
+    assign player1_rel_H = i_VGA_H - player1_H_min;
+    assign player1_rel_V = i_VGA_V - player1_V_min;
+    assign player2_rel_H = i_VGA_H - player2_H_min;
+    assign player2_rel_V = i_VGA_V - player2_V_min;
 
-    wire [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] render_car1_index, render_car2_index;
-    assign render_car1_index = car1_rel_V * sram_pkg::CAR_SIZE + car1_rel_H;
-    assign render_car2_index = car2_rel_V * sram_pkg::CAR_SIZE + car2_rel_H;
+    wire [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] render_player1_index, render_player2_index;
+    assign render_player1_index = player1_rel_V * sram_pkg::PLAYER_SIZE + player1_rel_H;
+    assign render_player2_index = player2_rel_V * sram_pkg::PLAYER_SIZE + player2_rel_H;
+
+    /*------------------------------------------------------ bullet render ------------------------------------------------------*/
+    wire [sram_pkg::MAP_H_WIDTH-1:0] bullet1_H_min, bullet1_H_max;
+    wire [sram_pkg::MAP_V_WIDTH-1:0] bullet1_V_min, bullet1_V_max;
+    XYtoBoundaries_Bullet xy_2_hv_bullet1 (
+        .i_x        (i_bullet1_x),
+        .i_y        (i_bullet1_y),
+        .o_H_min    (bullet1_H_min),
+        .o_H_max    (bullet1_H_max),
+        .o_V_min    (bullet1_V_min),
+        .o_V_max    (bullet1_V_max)
+    );
+
+    wire [sram_pkg::MAP_H_WIDTH-1:0] bullet2_H_min, bullet2_H_max;
+    wire [sram_pkg::MAP_V_WIDTH-1:0] bullet2_V_min, bullet2_V_max;
+    XYtoBoundaries_Bullet xy_2_hv_player2 (
+        .i_x        (i_bullet2_x),
+        .i_y        (i_bullet2_y),
+        .o_H_min    (bullet2_H_min),
+        .o_H_max    (bullet2_H_max),
+        .o_V_min    (bullet2_V_min),
+        .o_V_max    (bullet2_V_max)
+    );
+
+    wire render_bullet1, render_bullet2;
+    assign render_bullet1 = (i_bullet1_valid)
+                        & i_VGA_H >= bullet1_H_min
+                        & i_VGA_H <= bullet1_H_max
+                        & i_VGA_V >= bullet1_V_min
+                        & i_VGA_V <= bullet1_V_max;
+    assign render_bullet2 = (i_bullet2_valid)
+                        & i_VGA_H >= bullet2_H_min 
+                        & i_VGA_H <= bullet2_H_max
+                        & i_VGA_V >= bullet2_V_min 
+                        & i_VGA_V <= bullet2_V_max;
+
+    wire [sram_pkg::MAP_H_WIDTH-1:0] bullet1_rel_H, bullet2_rel_H;
+    wire [sram_pkg::MAP_V_WIDTH-1:0] bullet1_rel_V, bullet2_rel_V;
+    assign bullet1_rel_H = i_VGA_H - bullet1_H_min;
+    assign bullet1_rel_V = i_VGA_V - bullet1_V_min;
+    assign bullet2_rel_H = i_VGA_H - bullet2_H_min;
+    assign bullet2_rel_V = i_VGA_V - bullet2_V_min;
+
+    wire [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] render_bullet1_index, render_bullet2_index;
+    assign render_bullet1_index = bullet1_rel_V * sram_pkg::BULLET_SIZE + bullet1_rel_H;
+    assign render_bullet2_index = bullet2_rel_V * sram_pkg::BULLET_SIZE + bullet2_rel_H;
 
     /*----------------------------------------------------- HP render -----------------------------------------------------*/
+    /*
     wire render_car1_level, render_car2_level;
     wire [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] render_car1_level_index, render_car2_level_index;
     SingleDigitDisplayDecoder u_SingleDigitDisplayDecoder_car1_level (
@@ -100,11 +164,11 @@ module PixelDecoder (
         .o_render                (render_car2_level),
         .o_object_pixel_index    (render_car2_level_index)
     );
-
+    */
     /*------------------------------------------------- start caption render -------------------------------------------------*/
     wire render_start_caption;
     wire [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] render_start_caption_index;
-    assign render_start_caption = (i_game_result == game_pkg::GAME_RESULT_IDLE)
+    assign render_start_caption = (IDLE)
                                 & i_VGA_H >= game_pkg::START_CAPTION_H_POS_MIN 
                                 & i_VGA_H <= game_pkg::START_CAPTION_H_POS_MAX 
                                 & i_VGA_V >= game_pkg::START_CAPTION_V_POS_MIN 
@@ -112,134 +176,123 @@ module PixelDecoder (
     assign render_start_caption_index = (i_VGA_V - game_pkg::START_CAPTION_V_POS_MIN) * sram_pkg::START_CAPTION_H + i_VGA_H - game_pkg::START_CAPTION_H_POS_MIN;
 
     /*-------------------------------------------------- win/lose caption render --------------------------------------------------*/
-    wire render_left_caption, render_right_caption;
-    wire [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] render_left_caption_index, render_right_caption_index;
-    assign render_left_caption = (i_game_result == game_pkg::GAME_RESULT_CAR1_WIN | i_game_result == game_pkg::GAME_RESULT_CAR2_WIN)
-                                & i_VGA_H >= game_pkg::WIN_LOSE_LEFT_CAPTION_H_POS_MIN
-                                & i_VGA_H <= game_pkg::WIN_LOSE_LEFT_CAPTION_H_POS_MAX
-                                & i_VGA_V >= game_pkg::WIN_LOSE_CAPTION_V_POS_MIN
-                                & i_VGA_V <= game_pkg::WIN_LOSE_CAPTION_V_POS_MAX;
-    assign render_right_caption = (i_game_result == game_pkg::GAME_RESULT_CAR1_WIN | i_game_result == game_pkg::GAME_RESULT_CAR2_WIN)
-                                & i_VGA_H >= game_pkg::WIN_LOSE_RIGHT_CAPTION_H_POS_MIN
-                                & i_VGA_H <= game_pkg::WIN_LOSE_RIGHT_CAPTION_H_POS_MAX
-                                & i_VGA_V >= game_pkg::WIN_LOSE_CAPTION_V_POS_MIN
-                                & i_VGA_V <= game_pkg::WIN_LOSE_CAPTION_V_POS_MAX;
-    assign render_left_caption_index = (i_VGA_V - game_pkg::WIN_LOSE_CAPTION_V_POS_MIN) * sram_pkg::WIN_LOSE_CAPTION_H + i_VGA_H - game_pkg::WIN_LOSE_LEFT_CAPTION_H_POS_MIN;
-    assign render_right_caption_index = (i_VGA_V - game_pkg::WIN_LOSE_CAPTION_V_POS_MIN) * sram_pkg::WIN_LOSE_CAPTION_H + i_VGA_H - game_pkg::WIN_LOSE_RIGHT_CAPTION_H_POS_MIN;
-
+    wire render_win_caption, render_lose_caption;
+    wire [sram_pkg::MAP_H_WIDTH+sram_pkg::MAP_V_WIDTH-1:0] render_win_caption_index, render_lose_caption_index;
+    assign render_win_caption = (WIN)
+                                & i_VGA_H >= game_pkg::WIN_CAPTION_H_POS_MIN
+                                & i_VGA_H <= game_pkg::WIN_CAPTION_H_POS_MAX
+                                & i_VGA_V >= game_pkg::WIN_CAPTION_V_POS_MIN
+                                & i_VGA_V <= game_pkg::WIN_CAPTION_V_POS_MAX;
+    assign render_loss_caption = (LOSE)
+                                & i_VGA_H >= game_pkg::LOSE_CAPTION_H_POS_MIN
+                                & i_VGA_H <= game_pkg::LOSE_CAPTION_H_POS_MAX
+                                & i_VGA_V >= game_pkg::LOSE_CAPTION_V_POS_MIN
+                                & i_VGA_V <= game_pkg::LOSE_CAPTION_V_POS_MAX;
+    assign render_win_caption_index = (i_VGA_V - game_pkg::WIN_LOSE_CAPTION_V_POS_MIN) * sram_pkg::WIN_LOSE_CAPTION_H + i_VGA_H - game_pkg::WIN_CAPTION_H_POS_MIN;
+    assign render_lose_caption_index = (i_VGA_V - game_pkg::WIN_LOSE_CAPTION_V_POS_MIN) * sram_pkg::WIN_LOSE_CAPTION_H + i_VGA_H - game_pkg::LOSE_CAPTION_H_POS_MIN;
 
     /*----------------------------------------------------- render logic -----------------------------------------------------*/
     always @(*) begin
         if (i_is_gaming) begin
             if (i_VGA_V <= sram_pkg::MAP_V) begin
-                if (render_car1) begin
-                    if (i_car1_opacity_mask[car1_rel_V][car1_rel_H]) begin
-                        // not transparent, render car1
-                        // $display("render car1 at (%d, %d)", i_VGA_H, i_VGA_V);
-                        o_object_id = game_pkg::OBJECT_CAR1;
-                        o_object_pixel_index = render_car1_index; // VGA H and V start from 1, already handled in XYtoBoundaries
+                if (render_player1) begin
+                    if (i_player1_opacity_mask[player1_rel_V][player1_rel_H]) begin
+                        o_object_id = game_pkg::OBJECT_PLAYER1;
+                        o_object_pixel_index = render_player1_index;
                     end
-                    else begin
-                        // transparent, render map
-                        o_object_id = game_pkg::OBJECT_MAP;
-                        o_object_pixel_index = render_map_index; // VGA H and V start from 1
+                    else if (i_player1_shield) begin
+                        o_object_id = game_pkg::OBJECT_PLAYER1_SHIELD;
+                        o_object_pixel_index = render_player1_index;
                     end
-                end
-                else if (render_car2) begin
-                    if (i_car2_opacity_mask[car2_rel_V][car2_rel_H]) begin
-                        // not transparent, render car2
-                        // $display("render car2 at (%d, %d)", i_VGA_H, i_VGA_V);
-                        o_object_id = game_pkg::OBJECT_CAR2;
-                        o_object_pixel_index = render_car2_index; // VGA H and V start from 1, already handled in XYtoBoundaries
+                    else if (i_player1_squat) begin
+                        o_object_id = game_pkg::OBJECT_PLAYER1_SQUAT;
+                        o_object_pixel_index = render_player1_index;
                     end
-                    else begin
-                        // transparent, render map
-                        o_object_id = game_pkg::OBJECT_MAP;
-                        o_object_pixel_index = render_map_index; // VGA H and V start from 1
-                    end
-                end
-                else begin
-                    // render map
-                    o_object_id = game_pkg::OBJECT_MAP;
-                    o_object_pixel_index = render_map_index; // VGA H and V start from 1
-                end
-            end
 
-            // for HP !!!
-            
-            /*
-            else begin
-                if (render_car1_digit != game_pkg::VELOCITY_DISPLAY_BG) begin
-                    o_object_id = game_pkg::OBJECT_BAR_DIGIT;
-                    o_object_pixel_index = render_car1_digit_pixel_index; // VGA H and V start from 1
+                    else begin
+                        o_object_id = game_pkg::OBJECT_MAP;
+                        o_object_pixel_index = render_map_index; 
+                    end
                 end
-                else if (render_car2_digit != game_pkg::VELOCITY_DISPLAY_BG) begin
-                    o_object_id = game_pkg::OBJECT_BAR_DIGIT;
-                    o_object_pixel_index = render_car2_digit_pixel_index; // VGA H and V start from 1
+                else if (render_player2) begin
+                    if (i_player2_opacity_mask[player2_rel_V][player2_rel_H]) begin
+                        o_object_id = game_pkg::OBJECT_PLAYER2;
+                        o_object_pixel_index = render_player2_index
+                    end
+                    else if (i_player2_shield) begin
+                        o_object_id = game_pkg::OBJECT_PLAYER2_SHIELD;
+                        o_object_pixel_index = render_player2_index;
+                    end
+                    else if (i_player2_squat) begin
+                        o_object_id = game_pkg::OBJECT_PLAYER2_SQUAT;
+                        o_object_pixel_index = render_player2_index;
+                    end
+
+                    else begin
+                        o_object_id = game_pkg::OBJECT_MAP;
+                        o_object_pixel_index = render_map_index; 
+                    end
                 end
-                else if (render_car1_level) begin
-                    o_object_id = game_pkg::OBJECT_BAR_DIGIT;
-                    o_object_pixel_index = render_car1_level_index; // VGA H and V start from 1
+                else if (render_bullet1) begin
+                    if (i_bullet1_opacity_mask[bullet1_rel_V][bullet1_rel_H]) begin
+                        o_object_id = game_pkg::OBJECT_BULLET1;
+                        o_object_pixel_index = render_bullet1_index;
+                    end
+                    else begin
+                        o_object_id = game_pkg::OBJECT_MAP;
+                        o_object_pixel_index = render_map_index; 
+                    end
                 end
-                else if (render_car2_level) begin
-                    o_object_id = game_pkg::OBJECT_BAR_DIGIT;
-                    o_object_pixel_index = render_car2_level_index; // VGA H and V start from 1
+
+                else if (render_bullet2) begin
+                    if (i_bullet2_opacity_mask[bullet2_rel_V][bullet2_rel_H]) begin
+                        o_object_id = game_pkg::OBJECT_BULLET2;
+                        o_object_pixel_index = render_bullet2_index;
+                    end
+                    else begin
+                        o_object_id = game_pkg::OBJECT_MAP;
+                        o_object_pixel_index = render_map_index; 
+                    end
                 end
-                else if (render_car1_lap) begin
-                    o_object_id = game_pkg::OBJECT_BAR_DIGIT;
-                    o_object_pixel_index = render_car1_lap_index; // VGA H and V start from 1
-                end
-                else if (render_car2_lap) begin
-                    o_object_id = game_pkg::OBJECT_BAR_DIGIT;
-                    o_object_pixel_index = render_car2_lap_index; // VGA H and V start from 1
-                end
+
                 else begin
-                    o_object_id = game_pkg::OBJECT_BAR;
-                    o_object_pixel_index = render_bar_index; // not important, just set to 0
+                    o_object_id = game_pkg::OBJECT_MAP;
+                    o_object_pixel_index = render_map_index; 
                 end
             end
-            */
         end
 
         else begin
-            if (i_game_result == game_pkg::GAME_RESULT_CAR1_WIN) begin
-                if (render_left_caption) begin
+            if (WIN) begin
+                if (render_win_caption) begin
                     o_object_id = game_pkg::OBJECT_WIN_CAPTION;
-                    o_object_pixel_index = render_left_caption_index; // VGA H and V start from 1
-                end
-                else if (render_right_caption) begin
-                    o_object_id = game_pkg::OBJECT_LOSE_CAPTION;
-                    o_object_pixel_index = render_right_caption_index; // VGA H and V start from 1
+                    o_object_pixel_index = render_win_caption_index; 
                 end
                 else begin
                     o_object_id = game_pkg::OBJECT_IDLE_BG;
-                    o_object_pixel_index = render_map_index; // VGA H and V start from 1
+                    o_object_pixel_index = render_map_index; 
                 end
             end
 
-            else if (i_game_result == game_pkg::GAME_RESULT_CAR2_WIN) begin
-                if (render_left_caption) begin
+            else if (LOSE) begin
+                if (render_loss_caption) begin
                     o_object_id = game_pkg::OBJECT_LOSE_CAPTION;
-                    o_object_pixel_index = render_left_caption_index; // VGA H and V start from 1
-                end
-                else if (render_right_caption) begin
-                    o_object_id = game_pkg::OBJECT_WIN_CAPTION;
-                    o_object_pixel_index = render_right_caption_index; // VGA H and V start from 1
+                    o_object_pixel_index = render_lose_caption_index; 
                 end
                 else begin
                     o_object_id = game_pkg::OBJECT_IDLE_BG;
-                    o_object_pixel_index = render_map_index; // VGA H and V start from 1
+                    o_object_pixel_index = render_map_index; 
                 end
             end
 
             else begin
                 if (render_start_caption) begin
                     o_object_id = game_pkg::OBJECT_START_CAPTION;
-                    o_object_pixel_index = render_start_caption_index; // VGA H and V start from 1
+                    o_object_pixel_index = render_start_caption_index; 
                 end
                 else begin
-                    o_object_id = game_pkg::OBJECT_IDLE_BG;
-                    o_object_pixel_index = render_map_index; // VGA H and V start from 1
+                    o_object_id = game_pkg::OBJECT_START_BG;
+                    o_object_pixel_index = render_map_index; 
                 end
             end
         end
@@ -247,7 +300,7 @@ module PixelDecoder (
 endmodule
 
 
-module XYtoBoundaries (
+module XYtoBoundaries_Player (
     input signed [sram_pkg::MAP_H_WIDTH-1:0] i_x,
     input signed [sram_pkg::MAP_V_WIDTH-1:0] i_y,
     output [sram_pkg::MAP_H_WIDTH-1:0] o_H_min,
@@ -256,55 +309,33 @@ module XYtoBoundaries (
     output [sram_pkg::MAP_V_WIDTH-1:0] o_V_max
 );
 
-    assign o_H_min = i_x + ((sram_pkg::MAP_H - sram_pkg::CAR_SIZE) >> 1) + 1;
-    assign o_H_max = i_x + ((sram_pkg::MAP_H + sram_pkg::CAR_SIZE) >> 1);
-    assign o_V_min = -i_y + ((sram_pkg::MAP_V - sram_pkg::CAR_SIZE) >> 1) + 1;
-    assign o_V_max = -i_y + ((sram_pkg::MAP_V + sram_pkg::CAR_SIZE) >> 1);
+    assign o_H_min = i_x + ((sram_pkg::MAP_H - sram_pkg::PLAYER_SIZE) >> 1) + 1;
+    assign o_H_max = i_x + ((sram_pkg::MAP_H + sram_pkg::PLAYER_SIZE) >> 1);
+    assign o_V_min = -i_y + ((sram_pkg::MAP_V - sram_pkg::PLAYER_SIZE) >> 1) + 1;
+    assign o_V_max = -i_y + ((sram_pkg::MAP_V + sram_pkg::PLAYER_SIZE) >> 1);
 endmodule
 
-/*
-module CarCircleGenerator (
-    input [sram_pkg::MAP_H_WIDTH-1:0] i_H_render,
-    input [sram_pkg::MAP_V_WIDTH-1:0] i_V_render,
-
+module XYtoBoundaries_Bullet (
     input signed [sram_pkg::MAP_H_WIDTH-1:0] i_x,
     input signed [sram_pkg::MAP_V_WIDTH-1:0] i_y,
+    output [sram_pkg::MAP_H_WIDTH-1:0] o_H_min,
+    output [sram_pkg::MAP_H_WIDTH-1:0] o_H_max,
+    output [sram_pkg::MAP_V_WIDTH-1:0] o_V_min,
+    output [sram_pkg::MAP_V_WIDTH-1:0] o_V_max
+);
 
-    output o_render
-);    
-    // if the distance of
-    // render pixel coor and the center between (CAR_SIZE/2-CAR_CIRCLE_PIXEL_WIDTH) and (CAR_SIZE/2)
-    // then render the circle
-
-    // (H,V) is converted to (x_h,y_v)
-    // x_h = H - MAP_H/2 - 0.5
-    // y_v = MAP_V/2 - V + 0.5
-    // use (2x, 2y) to avoid floating point calculation
-    // 2x_h = 2H - MAP_H - 1
-    // 2y_v = MAP_V - 2V - 1
-    // distance_square = (2x_h-2i_x)^2 + (2y_v-2i_y)^2
-    // if (CAR_SIZE-CAR_CIRCLE_PIXEL_WIDTH*2)^2 <= distance_square <= (CAR_SIZE)^2, render
-    
-    wire signed [sram_pkg::MAP_H_WIDTH:0] x_h_times_2;
-    wire signed [sram_pkg::MAP_V_WIDTH:0] y_v_times_2;
-    assign x_h_times_2 = (i_H_render << 1) - sram_pkg::MAP_H - 1;
-    assign y_v_times_2 = sram_pkg::MAP_V - (i_V_render << 1) - 1;
-
-    wire signed [sram_pkg::MAP_H_WIDTH:0] x_h_minus_i_x_times_2;
-    wire signed [sram_pkg::MAP_V_WIDTH:0] y_v_minus_i_y_times_2;
-    assign x_h_minus_i_x_times_2 = x_h_times_2 - (i_x << 1);
-    assign y_v_minus_i_y_times_2 = y_v_times_2 - (i_y << 1);
-
-    wire signed [31:0] distance_square;
-    assign distance_square = x_h_minus_i_x_times_2 * x_h_minus_i_x_times_2 + y_v_minus_i_y_times_2 * y_v_minus_i_y_times_2;
-
-    wire signed [31:0] lower_bound, upper_bound;
-    assign lower_bound = (sram_pkg::CAR_SIZE - (game_pkg::CAR_CIRCLE_PIXEL_WIDTH << 1)) * (sram_pkg::CAR_SIZE - (game_pkg::CAR_CIRCLE_PIXEL_WIDTH << 2));
-    assign upper_bound = sram_pkg::CAR_SIZE * sram_pkg::CAR_SIZE;
-
-    assign o_render = (distance_square >= lower_bound) && (distance_square <= upper_bound);
+    assign o_H_min = i_x + ((sram_pkg::MAP_H - sram_pkg::BULLET_SIZE) >> 1) + 1;
+    assign o_H_max = i_x + ((sram_pkg::MAP_H + sram_pkg::BULLET_SIZE) >> 1);
+    assign o_V_min = -i_y + ((sram_pkg::MAP_V - sram_pkg::BULLET_SIZE) >> 1) + 1;
+    assign o_V_max = -i_y + ((sram_pkg::MAP_V + sram_pkg::BULLET_SIZE) >> 1);
 endmodule
-*/
+
+
+
+
+
+
+/*
 
 module SingleDigitDisplayDecoder (
     input [game_pkg::SINGLE_DIGIT_WIDTH-1:0] i_value,
@@ -335,3 +366,5 @@ module SingleDigitDisplayDecoder (
         end
     end
 endmodule
+
+*/
