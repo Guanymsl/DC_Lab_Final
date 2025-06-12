@@ -1,4 +1,4 @@
-module random_LFSR(
+module Random (
 	input enable,
 	input i_rst_n,
 	output [3:0] o_random_out
