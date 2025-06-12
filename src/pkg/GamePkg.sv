@@ -1,8 +1,8 @@
 package GamePkg;
-    localparam int MAX_X = 1023; // Maximum X coordinate
-    localparam int MAX_Y = 767;  // Maximum Y coordinate
     localparam int STEP_X = 5;   // Step size for X movement
     localparam int STEP_Y = 5;   // Step size for Y movement
+
+    localparam int BULLET_STEP_X = 11; // Width for position coordinates
 
     localparam int G = 1;        // Gravity constant
     localparam int V = 10;       // Initial jump velocity

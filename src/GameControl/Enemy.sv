@@ -1,7 +1,7 @@
 import GamePkg::*;
 import SramPkg::*;
 
-module Player (
+module Enemy (
     input  logic               clk,
     input  logic               rst_n,
     input  logic               right,

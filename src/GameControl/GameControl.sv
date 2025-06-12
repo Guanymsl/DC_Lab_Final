@@ -1,9 +1,8 @@
-import game_pkg::*;
-import sram_pkg::*;
+import GamePkg::*;
+import SramPkg::*;
 
 module GameControl (
     input logic clk,
-    input logic render_clk,
     input logic rst_n,
 
     input logic right,
@@ -14,23 +13,27 @@ module GameControl (
     input logic defend,
     input logic select,
 
-    output logic [1:0]                     o_state,
-    output logic signed [POS_WIDTH-1:0]   o_player_x,
-    output logic signed [POS_WIDTH-1:0]   o_player_y,
-    output logic [1:0]             o_player_hp,
-    output logic                   o_player_shield,
-    output logic                   o_player_squat,
-    output logic signed [POS_WIDTH-1:0]   o_enemy_x,
-    output logic signed [POS_WIDTH-1:0]   o_enemy_y,
-    output logic [1:0]             o_enemy_hp,
-    output logic                   o_enemy_shield,
-    output logic                   o_enemy_squat,
-    output logic signed [POS_WIDTH-1:0]   o_goodbullet_x,
-    output logic signed [POS_WIDTH-1:0]   o_goodbullet_y,
-    output logic                   o_goodbullet_isE,
-    output logic signed [POS_WIDTH-1:0]   o_badbullet_x,
-    output logic signed [POS_WIDTH-1:0]   o_badbullet_y,
-    output logic                   o_badbullet_isE
+    output logic        [ 1:0] o_state,
+
+    output logic signed [10:0] o_player_x,
+    output logic signed [ 9:0] o_player_y,
+    output logic        [ 1:0] o_player_hp,
+    output logic               o_player_shield,
+    output logic               o_player_squat,
+
+    output logic signed [10:0] o_enemy_x,
+    output logic signed [ 9:0] o_enemy_y,
+    output logic        [ 1:0] o_enemy_hp,
+    output logic               o_enemy_shield,
+    output logic               o_enemy_squat,
+
+    output logic signed [10:0] o_goodbullet_x,
+    output logic signed [ 9:0] o_goodbullet_y,
+    output logic               o_goodbullet_isE,
+
+    output logic signed [10:0] o_badbullet_x,
+    output logic signed [ 9:0] o_badbullet_y,
+    output logic               o_badbullet_isE
 );
 
     localparam S_START = 2'b00;
@@ -67,6 +70,25 @@ module GameControl (
 
     logic rightRd, leftRd, jumpRd, squatRd, attackRd, defendRd;
 
+    logic playerIsD, playerIsQ, playerIsJ, playerIsHit;
+    logic enemyIsD, enemyIsQ, enemyIsJ, enemyIsHit;
+
+    logic goodIsE, badIsE;
+
+    logic [1:0] player_hp_r, player_hp_w;
+    logic [1:0] enemy_hp_r, enemy_hp_w;
+
+    assign o_state = state_r;
+    assign o_player_shield = playerIsD;
+    assign o_player_squat = playerIsQ;
+    assign o_enemy_shield = enemyIsD;
+    assign o_enemy_squat = enemyIsQ;
+    assign o_goodbullet_isE = goodIsE;
+    assign o_badbullet_isE = badIsE;
+
+    assign o_player_hp = player_hp_r;
+    assign o_enemy_hp = enemy_hp_r;
+
     .Player player (
         .clk(clk),
         .rst_n(rst_n),
@@ -74,13 +96,12 @@ module GameControl (
         .left(left),
         .jump(jump),
         .squat(squat),
-        .attack(attack),
         .defend(defend),
         .x(o_player_x),
         .y(o_player_y),
-        .hp(o_player_hp),
-        .shield(o_player_shield),
-        .squat(o_player_squat)
+        .isD(playerIsD),
+        .isQ(playerIsQ),
+        .isJ(playerIsJ),
     );
 
     .Enemy enemy (
@@ -90,13 +111,12 @@ module GameControl (
         .left(leftRd),
         .jump(jumpRd),
         .squat(squatRd),
-        .attack(attackRd),
         .defend(defendRd),
         .x(o_enemy_x),
         .y(o_enemy_y),
-        .hp(o_enemy_hp),
-        .shield(o_enemy_shield),
-        .squat(o_enemy_squat)
+        .isD(enemyIsD),
+        .isQ(enemyIsQ),
+        .isJ(enemyIsJ),
     );
 
     .GoodBullet goodbullet (
@@ -106,9 +126,13 @@ module GameControl (
         .defend(defend),
         .xPlayer(o_player_x),
         .yPlayer(o_player_y),
+        .xEnemy(o_enemy_x),
+        .yEnemy(o_enemy_y),
+        .isQ(playerIsQ),
         .x(o_goodbullet_x),
         .y(o_goodbullet_y),
         .isE(o_goodbullet_isE)
+        .isHit(enemyIsHit)
     );
 
     .BadBullet badbullet (
@@ -116,11 +140,39 @@ module GameControl (
         .rst_n(rst_n),
         .attack(attackRd),
         .defend(defendRd),
-        .xPlayer(o_enemy_x),
-        .yPlayer(o_enemy_y),
+        .xEnemy(o_enemy_x),
+        .yEnemy(o_enemy_y),
+        .xPlayer(o_player_x),
+        .yPlayer(o_player_y),
+        .isQ(playerIsQ),
         .x(o_badbullet_x),
         .y(o_badbullet_y),
         .isE(o_badbullet_isE)
+        .isHit(playerIsHit)
     );
+
+    always_comb begin
+        player_hp_w = player_hp_r;
+        enemy_hp_w  = enemy_hp_r;
+
+        if (state_r == S_PLAY) begin
+            if (playerIsHit && ~playerIsD) begin
+                player_hp_w = player_hp_r - 1;
+            end
+            if (enemyIsHit && ~enemyIsD) begin
+                enemy_hp_w = enemy_hp_r - 1;
+            end
+        end
+    end
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            player_hp_r <= 2'b11;
+            enemy_hp_r  <= 2'b11;
+        end else begin
+            player_hp_r <= player_hp_w;
+            enemy_hp_r  <= enemy_hp_w;
+        end
+    end
 
 endmodule
