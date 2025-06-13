@@ -152,7 +152,7 @@ logic cnt_w, cnt_r;
 
 always_comb begin
 	cnt_w = cnt_r;
-	if (key0down) begin
+	if (KEY[0]) begin
 		cnt_w = 1'b1; // reset counter on key press
 	end
 end
@@ -205,15 +205,15 @@ parser parser0(
 top top0(
 	.i_clk              (CLK_108M),
 	.i_rst_n            (KEY[3]),
-	.i_start       		(KEY[0] && cnt_r),
-	.i_restart			(KEY[1]),
+	.i_start       		((~KEY[0]) && cnt_r),
+	.i_restart			((~KEY[1])),
 	.i_right			(right),
     .i_left			    (left),
     .i_jump				(jump),
     .i_squat			(squat),
     .i_attack			(attack),
     .i_defend			(defend),
-    .i_select			(KEY[0]),
+    .i_select			(~KEY[0]),
 	.o_SRAM_ADDR        (SRAM_ADDR),
 	.io_SRAM_DQ         (SRAM_DQ),
 	.o_SRAM_WE_N        (SRAM_WE_N),
