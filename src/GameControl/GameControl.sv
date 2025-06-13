@@ -50,7 +50,7 @@ module GameControl (
         state_w = state_r;
         case (state_r)
             S_START:
-                if (select) state_w = S_PLAY;
+                // if (select) state_w = S_PLAY;
             S_PLAY: begin
                 if (player_hp_r == 0) begin
                     state_w = S_LOSE;
@@ -59,13 +59,15 @@ module GameControl (
                 end
             end
             S_WIN, S_LOSE:
-                if (select) state_w = S_START;
+                // if (select) state_w = S_START;
         endcase
     end
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             state_r <= S_START;
+        end if (select) begin
+            state_r <= S_PLAY;
         end else begin
             state_r <= state_w;
         end
