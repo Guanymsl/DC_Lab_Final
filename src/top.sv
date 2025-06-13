@@ -213,8 +213,8 @@ module top (
     generate
         for (p = 0; p < sram_pkg::BULLET_SIZE; p = p + 1) begin: opacity_mask_generate_p
             for (q = 0; q < sram_pkg::BULLET_SIZE; q = q + 1) begin: opacity_mask_generate_q
-                assign bullet1_opacity_mask_w[i][j] = (bullet1_lut_data[i][j] != 0)?1'b1:1'b0;
-                assign bullet2_opacity_mask_w[i][j] = (bullet2_lut_data[i][j] != 0)?1'b1:1'b0;
+                assign bullet1_opacity_mask_w[p][q] = (bullet1_lut_data[p][q] != 0)?1'b1:1'b0;
+                assign bullet2_opacity_mask_w[p][q] = (bullet2_lut_data[p][q] != 0)?1'b1:1'b0;
             end
         end
     endgenerate
