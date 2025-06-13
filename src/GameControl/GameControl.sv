@@ -46,7 +46,7 @@ module GameControl (
         .o_debounced(o_select),
         .o_neg(o_select_neg),
         .o_pos(o_select_pos)
-    )
+    );
 
     localparam S_START = 2'b00;
     localparam S_PLAY  = 2'b01;
