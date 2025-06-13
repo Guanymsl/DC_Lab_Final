@@ -177,8 +177,8 @@ assign gpio_uart = GPIO[26];
 Altpll pll0( 
 	.clk_clk(CLOCK_50),
 	.reset_reset_n(key3down),
-	.altpll_108m_clk (CLK_108M),
-	.altpll_3226k_clk(CLK_3226K)
+	.altpll_0_108m_clk (CLK_108M),
+	.altpll_0_3226k_clk(CLK_3226K)
 );
 
 Debounce deb0(
