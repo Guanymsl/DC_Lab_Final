@@ -174,7 +174,7 @@ assign o_SRAM_LB_N = 1'b0;
 assign o_SRAM_UB_N = 1'b0;
 assign gpio_uart = GPIO[26]; 
 
-Altpll pll0( 
+Apltll pll0( 
 	.clk_clk(CLOCK_50),
 	.reset_reset_n(key3down),
 	.altpll_0_108m_clk (CLK_108M),
