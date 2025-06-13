@@ -19,7 +19,7 @@ module Enemy (
     logic signed [10:0] x_r, x_w;
     logic signed [ 9:0] y_r, y_w;
     logic               isJ_r, isJ_w;
-    logic        [ 3:0] Jcnt_r, Jcnt_w;
+    logic        [ 7:0] Jcnt_r, Jcnt_w;
 
     assign x   = x_r;
     assign y   = y_r;
@@ -48,15 +48,13 @@ module Enemy (
         Jcnt_w = Jcnt_r;
 
         if (isJ_r) begin
-            if (Jcnt_r >= MAX_J) begin
+            y_w = -MAP_Y + PLAYER_Y + V * Jcnt_r - (Jcnt_r * Jcnt_r) >>> 2;
+            if (y_w < -MAP_Y + PLAYER_Y) begin
+                y_w = -MAP_Y + PLAYER_Y;
                 isJ_w  = 0;
                 Jcnt_w = 0;
             end else begin
                 Jcnt_w = Jcnt_r + 1;
-            end
-            y_w = -MAP_Y + PLAYER_Y + V * Jcnt_r - (Jcnt_r * Jcnt_r) >>> 2;
-            if (y_w < -MAP_Y + PLAYER_Y) begin
-                y_w = -MAP_Y + PLAYER_Y;
             end
         end else begin
             if (jump) begin

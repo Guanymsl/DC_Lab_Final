@@ -97,5 +97,5 @@ void loop() {
 
     Serial1.write(packet);
 
-    delay(100);
+    delay(13);
 }
