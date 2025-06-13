@@ -181,20 +181,6 @@ Apltll pll0(
 	.altpll_0_3226k_clk(CLK_3226K)
 );
 
-Debounce deb0(
-	.i_in(KEY[0]), 
-	.i_rst_n(KEY[3]),
-	.i_clk(CLK_108M),
-	.o_neg(key0down) 
-);
-
-Debounce deb1(
-	.i_in(KEY[1]), 
-	.i_rst_n(KEY[3]),
-	.i_clk(CLK_108M),
-	.o_neg(key1down) 
-);
-
 rx rx0(
 	.clk(CLK_3226K),
 	.rst_n(KEY[3]),
@@ -217,15 +203,15 @@ parser parser0(
 top top0(
 	.i_clk              (CLK_108M),
 	.i_rst_n            (KEY[3]),
-	.i_start       		(key0down && cnt_r),
-	.i_restart			(key1down),
+	.i_start       		(KEY[0] && cnt_r),
+	.i_restart			(KEY[1]),
 	.i_right			(right),
     .i_left			    (left),
     .i_jump				(jump),
     .i_squat			(squat),
     .i_attack			(attack),
     .i_defend			(defend),
-    .i_select			(key0down),
+    .i_select			(KEY[0]),
 	.o_SRAM_ADDR        (SRAM_ADDR),
 	.io_SRAM_DQ         (SRAM_DQ),
 	.o_SRAM_WE_N        (SRAM_WE_N),
