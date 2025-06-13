@@ -1,10 +1,10 @@
 package game_pkg;
     import sram_pkg::*;
-    localparam int STEP_X = 4;
+    localparam int STEP_X = 6;
 
-    localparam int BULLET_STEP_X = 6;
+    localparam int BULLET_STEP_X = 12;
 
-    localparam int V = 15;
+    localparam int V = 8;
     localparam int MAX_J = 4 * V;
 
     localparam int LIMIT_X = VGA_H * 3 / 8;

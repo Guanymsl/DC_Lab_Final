@@ -87,16 +87,33 @@ module GameControl (
     logic dummy1, dummy2;
 
     Random random1 (
-        .enable(clk),
+        .enable(cntRd[6]),
         .i_rst_n(rst_n),
-        .o_random_out({rightRd, leftRd, jumpRd, dummy1})
+        .o_random_out({rightRd, attackRd, jumpRd, dummy1})
     );
 
     Random random2 (
-        .enable(clk),
+        .enable(cntRd[6]),
         .i_rst_n(rst_n),
-        .o_random_out({squatRd, attackRd, defendRd, dummy2})
+        .o_random_out({squatRd, leftRd, defendRd, dummy2})
     );
+
+    logic [6:0] cntRd;
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cntRd <= 0;
+        end else begin
+            if (state_r == S_PLAY) begin
+                if (cntRd == 7'b1111111) begin
+                    cntRd <= 0;
+                end else begin
+                    cntRd <= cntRd + 1;
+                end
+            end else begin
+                cntRd <= 0;
+            end
+        end
+    end
 
     Player player (
         .clk(clk),
