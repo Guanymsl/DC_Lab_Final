@@ -152,7 +152,7 @@ logic cnt_w, cnt_r;
 
 always_comb begin
 	cnt_w = cnt_r;
-	if (KEY[0]) begin
+	if (~KEY[0]) begin
 		cnt_w = 1'b1; // reset counter on key press
 	end
 end
