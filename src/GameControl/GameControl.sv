@@ -39,15 +39,6 @@ module GameControl (
 
     logic o_select, o_select_neg, o_select_pos;
 
-    Debounce dbc0 (
-        .i_in(select),
-        .i_clk(clk),
-        .i_rst_n(rst_n),
-        .o_debounced(o_select),
-        .o_neg(o_select_neg),
-        .o_pos(o_select_pos)
-    );
-
     localparam S_START = 2'b00;
     localparam S_PLAY  = 2'b01;
     localparam S_WIN   = 2'b10;
@@ -61,7 +52,7 @@ module GameControl (
         state_w = state_r;
         case (state_r)
             S_START:
-                if (o_select) state_w = S_PLAY;
+                if (select) state_w = S_PLAY;
             S_PLAY: begin
                 if (player_hp_r == 0) begin
                     state_w = S_LOSE;
@@ -70,7 +61,7 @@ module GameControl (
                 end
             end
             S_WIN, S_LOSE:
-                if (o_select) state_w = S_START;
+                if (select) state_w = S_START;
         endcase
     end
 
