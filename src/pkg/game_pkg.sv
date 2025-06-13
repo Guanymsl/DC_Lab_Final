@@ -4,7 +4,7 @@ package game_pkg;
 
     localparam int BULLET_STEP_X = 12;
 
-    localparam int V = 8;
+    localparam int V = 5;
     localparam int MAX_J = 4 * V;
 
     localparam int LIMIT_X = VGA_H * 3 / 8;
