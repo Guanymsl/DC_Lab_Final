@@ -48,7 +48,7 @@ module Enemy (
         Jcnt_w = Jcnt_r;
 
         if (isJ_r) begin
-            y_w = -MAP_Y + PLAYER_Y + V * Jcnt_r - (Jcnt_r * Jcnt_r) >>> 2;
+            y_w = -MAP_Y + PLAYER_Y + V * Jcnt_r - (Jcnt_r * Jcnt_r);
             if (y_w < -MAP_Y + PLAYER_Y) begin
                 y_w = -MAP_Y + PLAYER_Y;
                 isJ_w  = 0;
