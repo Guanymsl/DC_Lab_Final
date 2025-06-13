@@ -29,6 +29,11 @@ module FrameDecoder (
         input i_player2_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
         input i_bullet1_opacity_mask [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1],
         input i_bullet2_opacity_mask [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1],
+        
+        input i_player1_shield_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+        input i_player2_shield_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+        input i_player1_squat_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+        input i_player2_squat_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
 
         // Input from VGA:
         input [sram_pkg::MAP_H_WIDTH-1:0] i_VGA_H,
@@ -71,6 +76,10 @@ module FrameDecoder (
         .i_player2_opacity_mask (i_player2_opacity_mask),
         .i_bullet1_opacity_mask (i_bullet1_opacity_mask),
         .i_bullet2_opacity_mask (i_bullet2_opacity_mask),
+        .i_player1_shield_opacity_mask (i_player1_shield_opacity_mask),
+        .i_player2_shield_opacity_mask (i_player2_shield_opacity_mask),
+        .i_player1_squat_opacity_mask (i_player1_squat_opacity_mask),
+        .i_player2_squat_opacity_mask (i_player2_squat_opacity_mask),
         .i_VGA_H (i_VGA_H),
         .i_VGA_V (i_VGA_V),
         .i_player1_hp (i_player1_hp),

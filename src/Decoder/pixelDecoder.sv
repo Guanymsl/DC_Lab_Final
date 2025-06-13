@@ -20,6 +20,11 @@ module PixelDecoder (
     input i_bullet1_opacity_mask [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1],
     input i_bullet2_opacity_mask [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1],
 
+    input i_player1_shield_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+    input i_player2_shield_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+    input i_player1_squat_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+    input i_player2_squat_opacity_mask [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1],
+
     input [sram_pkg::MAP_H_WIDTH-1:0] i_VGA_H, 
     input [sram_pkg::MAP_V_WIDTH-1:0] i_VGA_V, 
 
@@ -200,11 +205,11 @@ module PixelDecoder (
                         o_object_id = game_pkg::OBJECT_PLAYER1;
                         o_object_pixel_index = render_player1_index;
                     end
-                    else if (i_player1_shield) begin
+                    else if (i_player1_shield && i_player1_shield_opacity_mask[player1_rel_V][player1_rel_H]) begin
                         o_object_id = game_pkg::OBJECT_PLAYER1_SHIELD;
                         o_object_pixel_index = render_player1_index;
                     end
-                    else if (i_player1_squat) begin
+                    else if (i_player1_squat && i_player1_squat_opacity_mask[player1_rel_V][player1_rel_H]) begin
                         o_object_id = game_pkg::OBJECT_PLAYER1_SQUAT;
                         o_object_pixel_index = render_player1_index;
                     end
@@ -219,11 +224,11 @@ module PixelDecoder (
                         o_object_id = game_pkg::OBJECT_PLAYER2;
                         o_object_pixel_index = render_player2_index;
                     end
-                    else if (i_player2_shield) begin
+                    else if (i_player2_shield && i_player2_shield_opacity_mask[player2_rel_V][player2_rel_H]) begin
                         o_object_id = game_pkg::OBJECT_PLAYER2_SHIELD;
                         o_object_pixel_index = render_player2_index;
                     end
-                    else if (i_player2_squat) begin
+                    else if (i_player2_squat && i_player2_squat_opacity_mask[player2_rel_V][player2_rel_H]) begin
                         o_object_id = game_pkg::OBJECT_PLAYER2_SQUAT;
                         o_object_pixel_index = render_player2_index;
                     end

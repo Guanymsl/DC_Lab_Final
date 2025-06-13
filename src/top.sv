@@ -64,6 +64,15 @@ module top (
     reg bullet1_opacity_mask_r [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1];
     reg bullet2_opacity_mask_w [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1];
     reg bullet2_opacity_mask_r [0:sram_pkg::BULLET_SIZE-1][0:sram_pkg::BULLET_SIZE-1];
+
+    reg player1_shield_opacity_mask_w [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    reg player1_shield_opacity_mask_r [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    reg player2_shield_opacity_mask_w [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    reg player2_shield_opacity_mask_r [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    reg player1_squat_opacity_mask_w [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    reg player1_squat_opacity_mask_r [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    reg player2_squat_opacity_mask_w [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    reg player2_squat_opacity_mask_r [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
     
     wire [game_pkg::HP_WIDTH-1:0] player1_hp;
     wire player1_shield;
@@ -80,7 +89,7 @@ module top (
 
     GameControl u_GameControl (
         .clk(render_clk),
-        .rst_n(i_rst_n),
+        .rst_n(i_rst_n|(~i_restart)),
         .right(i_right),
         .left(i_left),
         .jump(i_jump),
@@ -199,12 +208,37 @@ module top (
         .pixel_data    (bullet2_lut_data)
     );
 
+    wire [sram_pkg::COLOR_WIDTH-1:0] player1_shield_lut_data [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    player1_shield_lut u_player1_shield_lut (
+        .pixel_data    (player1_shield_lut_data)
+    );
+
+    wire [sram_pkg::COLOR_WIDTH-1:0] player2_shield_lut_data [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    player2_shield_lut u_player2_shield_lut (
+        .pixel_data    (player2_shield_lut_data)
+    );
+
+    wire [sram_pkg::COLOR_WIDTH-1:0] player1_squat_lut_data [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    player1_squat_lut u_player1_squat_lut (
+        .pixel_data    (player1_squat_lut_data)
+    );
+
+    wire [sram_pkg::COLOR_WIDTH-1:0] player2_squat_lut_data [0:sram_pkg::PLAYER_SIZE-1][0:sram_pkg::PLAYER_SIZE-1];
+    player2_squat_lut u_player2_squat_lut (
+        .pixel_data    (player2_squat_lut_data)
+    );
+
+
     genvar i, j;
     generate
         for (i = 0; i < sram_pkg::PLAYER_SIZE; i = i + 1) begin: opacity_mask_generate_i
             for (j = 0; j < sram_pkg::PLAYER_SIZE; j = j + 1) begin: opacity_mask_generate_j
                 assign player1_opacity_mask_w[i][j] = (player1_lut_data[i][j] != 0)?1'b1:1'b0;
                 assign player2_opacity_mask_w[i][j] = (player2_lut_data[i][j] != 0)?1'b1:1'b0;
+                assign player1_shield_opacity_mask_w[i][j] = (player1_shield_lut_data[i][j] != 0)?1'b1:1'b0;
+                assign player2_shield_opacity_mask_w[i][j] = (player2_shield_lut_data[i][j] != 0)?1'b1:1'b0;
+                assign player1_squat_opacity_mask_w[i][j] = (player1_squat_lut_data[i][j] != 0)?1'b1:1'b0;
+                assign player2_squat_opacity_mask_w[i][j] = (player2_squat_lut_data[i][j] != 0)?1'b1:1'b0;
             end
         end
     endgenerate
@@ -226,6 +260,10 @@ module top (
                 for (integer j = 0; j < sram_pkg::PLAYER_SIZE; j = j + 1) begin
                         player1_opacity_mask_r[i][j] <= 0;
                         player2_opacity_mask_r[i][j] <= 0;
+                        player1_shield_opacity_mask_r[i][j] <= 0;
+                        player2_shield_opacity_mask_r[i][j] <= 0;
+                        player1_squat_opacity_mask_r[i][j] <= 0;
+                        player2_squat_opacity_mask_r[i][j] <= 0;
                 end
             end
             for (integer i = 0; i < sram_pkg::BULLET_SIZE; i = i + 1) begin
@@ -241,6 +279,10 @@ module top (
                 for (integer j = 0; j < sram_pkg::PLAYER_SIZE; j = j + 1) begin
                         player1_opacity_mask_r[i][j] <= player1_opacity_mask_w[i][j];
                         player2_opacity_mask_r[i][j] <= player2_opacity_mask_w[i][j];
+                        player1_shield_opacity_mask_r[i][j] <= player1_shield_opacity_mask_w[i][j];
+                        player2_shield_opacity_mask_r[i][j] <= player2_shield_opacity_mask_w[i][j];
+                        player1_squat_opacity_mask_r[i][j] <= player1_squat_opacity_mask_w[i][j];
+                        player2_squat_opacity_mask_r[i][j] <= player2_squat_opacity_mask_w[i][j];
                 end
             end
             for (integer i = 0; i < sram_pkg::BULLET_SIZE; i = i + 1) begin
