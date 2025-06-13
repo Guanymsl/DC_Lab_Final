@@ -95,22 +95,22 @@ module GameControl (
     assign o_player_hp = player_hp_r;
     assign o_enemy_hp = enemy_hp_r;
 
-    logic dummy1, dummy2;
+    logic dummy1, dummy2, dummy3, dummy4;
 
     Random random1 (
         .enable(cntRd[6]),
         .i_rst_n(rst_n),
-        .o_random_out({rightRd, attackRd, jumpRd, dummy1})
+        .o_random_out({rightRd, dummy3, jumpRd, dummy1})
     );
 
     Random random2 (
         .enable(cntRd[6]),
         .i_rst_n(rst_n),
-        .o_random_out({squatRd, leftRd, defendRd, dummy2})
+        .o_random_out({squatRd, leftRd, dummy4, dummy2})
     );
 
-    attackRd = 1;
-    defendRd = 0;
+    assign attackRd = 1;
+    assign defendRd = 0;
 
     logic [6:0] cntRd;
     always_ff @(posedge clk or negedge rst_n) begin
