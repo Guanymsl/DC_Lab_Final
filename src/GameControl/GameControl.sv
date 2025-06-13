@@ -49,8 +49,8 @@ module GameControl (
     always_comb begin
         state_w = state_r;
         case (state_r)
-            //S_START:
-                // if (select) state_w = S_PLAY;
+            S_START:
+                if (select) state_w = S_PLAY;
             S_PLAY: begin
                 if (player_hp_r == 0) begin
                     state_w = S_LOSE;
@@ -58,8 +58,8 @@ module GameControl (
                     state_w = S_WIN;
                 end
             end
-            //S_WIN, S_LOSE:
-                // if (select) state_w = S_START;
+            S_WIN, S_LOSE:
+                if (select) state_w = S_START;
         endcase
     end
 
