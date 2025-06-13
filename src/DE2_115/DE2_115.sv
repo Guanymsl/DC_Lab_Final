@@ -188,6 +188,13 @@ Debounce deb0(
 	.o_neg(key0down) 
 );
 
+Debounce deb1(
+	.i_in(KEY[1]), 
+	.i_rst_n(KEY[3]),
+	.i_clk(CLK_108M),
+	.o_neg(key1down) 
+);
+
 rx rx0(
 	.clk(CLK_3226K),
 	.rst_n(KEY[3]),
@@ -211,7 +218,7 @@ top top0(
 	.i_clk              (CLK_108M),
 	.i_rst_n            (KEY[3]),
 	.i_start       		(key0down && cnt_r),
-	.i_restart			(KEY[1]),
+	.i_restart			(key1down),
 	.i_right			(right),
     .i_left			    (left),
     .i_jump				(jump),
