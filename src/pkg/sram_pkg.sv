@@ -16,8 +16,8 @@ package sram_pkg;
 
     // Image
     localparam int COLOR_WIDTH = 4;
-    localparam int PLAYER_SIZE = 200;
-    localparam int BULLET_SIZE = 100;
+    localparam int PLAYER_SIZE = 50;
+    localparam int BULLET_SIZE = 25;
 
     // Map
     localparam int MAP_H = VGA_H;
@@ -123,8 +123,8 @@ package sram_pkg;
     localparam int START_CAPTION_ADDR_END    = START_CAPTION_ADDR_START + START_CAPTION_ADDR_COUNT - 1;
 
     // Start background 區域
-    localparam int START_BG_PIXEL_COUNT = VGA_H * VGA_V;
-    localparam int START_BG_ADDR_COUNT  = START_BG_PIXEL_COUNT / PIXELS_PER_ADDR;
-    localparam int START_BG_ADDR_START  = START_CAPTION_ADDR_END + 1;
-    localparam int START_BG_ADDR_END    = START_BG_ADDR_START + START_BG_ADDR_COUNT - 1;
+    localparam int START_BG_PIXEL_COUNT = ;
+    localparam int START_BG_ADDR_COUNT  = ;
+    localparam int START_BG_ADDR_START  = ;
+    localparam int START_BG_ADDR_END    = ;
 endpackage

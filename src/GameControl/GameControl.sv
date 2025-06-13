@@ -87,13 +87,13 @@ module GameControl (
     logic dummy1, dummy2;
 
     Random random1 (
-        .enable(select),
+        .enable(clk),
         .i_rst_n(rst_n),
         .o_random_out({rightRd, leftRd, jumpRd, dummy1})
     );
 
     Random random2 (
-        .enable(select),
+        .enable(clk),
         .i_rst_n(rst_n),
         .o_random_out({squatRd, attackRd, defendRd, dummy2})
     );

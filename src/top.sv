@@ -80,7 +80,7 @@ module top (
 
     GameControl u_GameControl (
         .clk(render_clk),
-        .rst_n(i_rst_n|(~i_restart)),
+        .rst_n(i_rst_n),
         .right(i_right),
         .left(i_left),
         .jump(i_jump),
