@@ -210,7 +210,7 @@ parser parser0(
 top top0(
 	.i_clk              (CLK_108M),
 	.i_rst_n            (KEY[3]),
-	.i_start       		(select && cnt_r),
+	.i_start       		(key0down && cnt_r),
 	.i_restart			(KEY[0]),
 	.i_right			(right),
     .i_left			    (left),
@@ -218,7 +218,7 @@ top top0(
     .i_squat			(squat),
     .i_attack			(attack),
     .i_defend			(defend),
-    .i_select			(select),
+    .i_select			(key0down),
 	.o_SRAM_ADDR        (SRAM_ADDR),
 	.io_SRAM_DQ         (SRAM_DQ),
 	.o_SRAM_WE_N        (SRAM_WE_N),

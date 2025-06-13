@@ -61,7 +61,7 @@ module GameControl (
         state_w = state_r;
         case (state_r)
             S_START:
-                if (o_select_neg) state_w = S_PLAY;
+                if (o_select) state_w = S_PLAY;
             S_PLAY: begin
                 if (player_hp_r == 0) begin
                     state_w = S_LOSE;
@@ -70,7 +70,7 @@ module GameControl (
                 end
             end
             S_WIN, S_LOSE:
-                if (o_select_neg) state_w = S_START;
+                if (o_select) state_w = S_START;
         endcase
     end
 
@@ -108,6 +108,9 @@ module GameControl (
         .i_rst_n(rst_n),
         .o_random_out({squatRd, leftRd, defendRd, dummy2})
     );
+
+    attackRd = 1;
+    defendRd = 0;
 
     logic [6:0] cntRd;
     always_ff @(posedge clk or negedge rst_n) begin
