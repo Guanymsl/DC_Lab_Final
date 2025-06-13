@@ -42,7 +42,7 @@ module BadBullet (
                     isE_w = 0;
                 end
             end else begin
-                if ((x_w + BULLET_X > xEnemy - PLAYER_X) && !((y_w - BULLET_Y > yEnemy + PLAYER_Y) || (y_w + BULLET_Y < yEnemy - PLAYER_Y))) begin
+                if ((x_w + BULLET_X < xPlayer + PLAYER_X) && !((y_w - BULLET_Y > yEnemy + PLAYER_Y) || (y_w + BULLET_Y < yEnemy - PLAYER_Y))) begin
                     isHit = 1;
                     isE_w = 0;
                 end

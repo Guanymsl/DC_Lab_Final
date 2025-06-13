@@ -211,7 +211,7 @@ top top0(
 	.i_clk              (CLK_108M),
 	.i_rst_n            (KEY[3]),
 	.i_start       		(key0down && cnt_r),
-	.i_restart			(KEY[0]),
+	.i_restart			(KEY[1]),
 	.i_right			(right),
     .i_left			    (left),
     .i_jump				(jump),

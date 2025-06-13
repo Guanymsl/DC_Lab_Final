@@ -37,8 +37,6 @@ module GameControl (
     output logic               o_badbullet_isE
 );
 
-    logic o_select, o_select_neg, o_select_pos;
-
     localparam S_START = 2'b00;
     localparam S_PLAY  = 2'b01;
     localparam S_WIN   = 2'b10;
