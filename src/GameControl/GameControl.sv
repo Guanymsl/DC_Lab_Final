@@ -61,7 +61,7 @@ module GameControl (
         state_w = state_r;
         case (state_r)
             S_START:
-                if (o_select) state_w = S_PLAY;
+                if (o_select_neg) state_w = S_PLAY;
             S_PLAY: begin
                 if (player_hp_r == 0) begin
                     state_w = S_LOSE;
@@ -70,7 +70,7 @@ module GameControl (
                 end
             end
             S_WIN, S_LOSE:
-                if (o_select) state_w = S_START;
+                if (o_select_neg) state_w = S_START;
         endcase
     end
 
