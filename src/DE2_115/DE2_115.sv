@@ -176,10 +176,12 @@ assign gpio_uart = GPIO[26];
 
 Apltll pll0( 
 	.clk_clk(CLOCK_50),
-	.reset_reset_n(key3down),
+	.reset_reset_n(KEY[3]),
 	.altpll_0_108m_clk (CLK_108M),
 	.altpll_0_3226k_clk(CLK_3226K)
 );
+
+
 
 rx rx0(
 	.clk(CLK_3226K),
