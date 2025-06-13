@@ -123,8 +123,8 @@ package sram_pkg;
     localparam int START_CAPTION_ADDR_END    = START_CAPTION_ADDR_START + START_CAPTION_ADDR_COUNT - 1;
 
     // Start background 區域
-    localparam int START_BG_PIXEL_COUNT = ;
-    localparam int START_BG_ADDR_COUNT  = ;
-    localparam int START_BG_ADDR_START  = ;
-    localparam int START_BG_ADDR_END    = ;
+    localparam int START_BG_PIXEL_COUNT = IDLE_BG_PIXEL_COUNT;
+    localparam int START_BG_ADDR_COUNT  = IDLE_BG_ADDR_COUNT;
+    localparam int START_BG_ADDR_START  = IDLE_BG_ADDR_START;
+    localparam int START_BG_ADDR_END    = IDLE_BG_ADDR_END;
 endpackage
