@@ -1,7 +1,7 @@
-import game_pkg::*;
-import sram_pkg::*;
+import game_param::*;
+import sram_param::*;
 
-module Enemy (
+module Player (
     input  logic               clk,
     input  logic               rst_n,
     input  logic               right,
@@ -35,10 +35,10 @@ module Enemy (
             x_w = x_r - STEP_X;
         end
 
-        if (x_w > MAP_X - PLAYER_X) begin
-            x_w = MAP_X - PLAYER_X;
-        end else if (x_w < MAP_X - LIMIT_X) begin
-            x_w = MAP_X - LIMIT_X;
+        if (x_w > -MAP_X + LIMIT_X) begin
+            x_w = -MAP_X + LIMIT_X;
+        end else if (x_w < -MAP_X + PLAYER_X) begin
+            x_w = -MAP_X + PLAYER_X;
         end
     end
 
@@ -67,7 +67,7 @@ module Enemy (
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            x_r     <= MAP_X - PLAYER_X;
+            x_r     <= -MAP_X + PLAYER_X;
             y_r     <= -MAP_Y + PLAYER_Y;
             isJ_r   <= 0;
             Jcnt_r  <= 0;

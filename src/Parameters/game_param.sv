@@ -1,5 +1,5 @@
-package game_pkg;
-    import sram_pkg::*;
+package game_param;
+    import sram_param::*;
     localparam int STEP_X = 6;
 
     localparam int BULLET_STEP_X = 12;
@@ -9,7 +9,7 @@ package game_pkg;
 
     localparam int LIMIT_X = VGA_H * 3 / 8;
 
-    localparam int OBJECT_OPACITY_NUM = 2; // no map and bar and ?blocks
+    localparam int OBJECT_OPACITY_NUM = 2;
     localparam int OBJECT_OPACITY_NUM_WIDTH = 2;
 
     localparam int HP_WIDTH = 3;
@@ -30,13 +30,6 @@ package game_pkg;
         OBJECT_START_CAPTION = 4'd12,
         OBJECT_START_BG = 4'd13
     } ObjectID;
-
-    /*
-    localparam int CAR1_INIT_X = -500;
-    localparam int CAR1_INIT_Y = -250 - (sram_pkg::CAR_SIZE>>1) - 10;
-    localparam int CAR2_INIT_X = -500;
-    localparam int CAR2_INIT_Y = -365 + (sram_pkg::CAR_SIZE>>1) + 10;
-    */
 
     localparam int START_CAPTION_H_POS_MIN = 470;
     localparam int START_CAPTION_H_POS_MAX = START_CAPTION_H_POS_MIN + sram_pkg::START_CAPTION_H - 1;

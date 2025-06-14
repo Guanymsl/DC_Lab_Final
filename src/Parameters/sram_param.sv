@@ -1,4 +1,4 @@
-package sram_pkg;
+package sram_param;
     localparam int MAP_X = VGA_H / 2;
     localparam int MAP_Y = VGA_V / 2;
 

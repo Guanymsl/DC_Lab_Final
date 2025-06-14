@@ -1,10 +1,10 @@
-import game_pkg::*;
-import sram_pkg::*;
+import game_param::*;
+import sram_param::*;
 
-module ColorDecoder (
-    input game_pkg::ObjectID i_object_id,
-    input [sram_pkg::COLOR_WIDTH-1:0] i_encoded_color,
-    output [23:0] o_decoded_color
+module ColorMapping (
+    input game_param::ObjectID i_object_id,
+    input [sram_param::COLOR_WIDTH-1:0] i_compressed_color,
+    output [23:0] o_decompressed_color
 );
     wire [23:0] map_color [0:15];
     map_palette u_map_palette (
@@ -76,27 +76,27 @@ module ColorDecoder (
         .color_map    (start_bg_color),
     );
 
-    reg [23:0] decoded_color;
-    assign o_decoded_color = decoded_color;
+    reg [23:0] decompressed_color;
+    assign o_decompressed_color = decompressed_color;
 
-    always @(*) begin
-        decoded_color = 24'hffffff;
+    always_comb begin
+        decompressed_color = 24'hffffff;
         case(i_object_id)
             
-            game_pkg::OBJECT_MAP            : decoded_color = map_color[i_encoded_color];
-            game_pkg::OBJECT_PLAYER1        : decoded_color = player1_color[i_encoded_color];
-            game_pkg::OBJECT_PLAYER1_SHIELD : decoded_color = player1_color[i_encoded_color];
-            game_pkg::OBJECT_PLAYER1_SQUAT  : decoded_color = player1_squat_color[i_encoded_color];
-            game_pkg::OBJECT_PLAYER2        : decoded_color = player2_color[i_encoded_color];
-            game_pkg::OBJECT_PLAYER2_SHIELD : decoded_color = player2_shield_color[i_encoded_color];
-            game_pkg::OBJECT_PLAYER2_SQUAT  : decoded_color = player2_squat_color[i_encoded_color];
-            game_pkg::OBJECT_BULLET1        : decoded_color = bullet1_color[i_encoded_color];
-            game_pkg::OBJECT_BULLET2        : decoded_color = bullet2_color[i_encoded_color];
-            game_pkg::OBJECT_WIN_CAPTION    : decoded_color = win_caption_color[i_encoded_color];
-            game_pkg::OBJECT_LOSE_CAPTION   : decoded_color = lose_caption_color[i_encoded_color];
-            game_pkg::OBJECT_IDLE_BG        : decoded_color = idle_bg_color[i_encoded_color];
-            game_pkg::OBJECT_START_CAPTION  : decoded_color = start_caption_color[i_encoded_color];
-            game_pkg::OBJECT_START_BG       : decoded_color = start_bg_color[i_encoded_color];
+            game_param::OBJECT_MAP            : decompressed_color = map_color[i_compressed_color];
+            game_param::OBJECT_PLAYER1        : decompressed_color = player1_color[i_compressed_color];
+            game_param::OBJECT_PLAYER1_SHIELD : decompressed_color = player1_color[i_compressed_color];
+            game_param::OBJECT_PLAYER1_SQUAT  : decompressed_color = player1_squat_color[i_compressed_color];
+            game_param::OBJECT_PLAYER2        : decompressed_color = player2_color[i_compressed_color];
+            game_param::OBJECT_PLAYER2_SHIELD : decompressed_color = player2_shield_color[i_compressed_color];
+            game_param::OBJECT_PLAYER2_SQUAT  : decompressed_color = player2_squat_color[i_compressed_color];
+            game_param::OBJECT_BULLET1        : decompressed_color = bullet1_color[i_compressed_color];
+            game_param::OBJECT_BULLET2        : decompressed_color = bullet2_color[i_compressed_color];
+            game_param::OBJECT_WIN_CAPTION    : decompressed_color = win_caption_color[i_compressed_color];
+            game_param::OBJECT_LOSE_CAPTION   : decompressed_color = lose_caption_color[i_compressed_color];
+            game_param::OBJECT_IDLE_BG        : decompressed_color = idle_bg_color[i_compressed_color];
+            game_param::OBJECT_START_CAPTION  : decompressed_color = start_caption_color[i_compressed_color];
+            game_param::OBJECT_START_BG       : decompressed_color = start_bg_color[i_compressed_color];
             
         endcase
     end
